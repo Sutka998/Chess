@@ -2,9 +2,10 @@
 
 namespace ch {
 	
-	Piece::Piece(Color color, const Position& position) 
-		: m_color(color), m_isMoved(false), m_position(position) {
-	}
+	Piece::Piece(Color color, const Position& position, PieceName pn) 
+		: m_color(color), m_position(position), pieceType(pn),
+		m_isMoved(false), m_mGridEvaled(false), m_hGridEvaled(false)
+	{}
 
 	bool Piece::isInGrid(const std::vector<Position>& m_grid, const Position& pos)
 	{
