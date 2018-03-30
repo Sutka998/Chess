@@ -4,7 +4,7 @@ namespace ch {
 	Pawn::Pawn(Color color, const Position& pos)
 		: Piece(color, pos, PieceName::PAWN), m_canBeEnPass(false)
 	{
-		m_evalMoveGrid();
+		m_evalMoveGrid(); //It should be done here, for the first time.
 		m_evalHitGrid();
 	}
 
@@ -15,7 +15,7 @@ namespace ch {
 		}
 		//Clearing the grid, because probably a new step happened, and have to give new details
 		m_moveGrid.clear();
-		
+
 		if(m_color == Color::WHITE) { //WHITE PAWN****
 			m_mGridAdd_white();
 		}
@@ -26,10 +26,28 @@ namespace ch {
 		return;
 	}
 	void Pawn::m_evalHitGrid() {
+		if(m_hGridEvaled) { return;} //Its evaluated since the last step
+		if(m_color == Color::WHITE) { //***WHITE, incrementing coordinates
+			if(m_position.getColumn() == Column::A) {
+				m_hitGrid.push_back(Position(Column::B, m_position.getRow()+1));
+			}
+			else if(m_position.getColumn() == Column::H) {
+				m_hitGrid.push_back(Position(Column::G, m_position.getRow()+1));
+			}
+			else {
+				Column c = m_position.getColumn();
+				int a = static_cast<int>(c);
+				a--;
+				c = static_cast<Column>(a);
+				m_hitGrid.push_back(Position(Column::G, m_position.getRow()+1));
+			}
+		} 
+		else {//***BLACK
 
+		}
 	}
 
-	void Pawn::m_mGridAdd_white(){
+	void Pawn::m_mGridAdd_white() {
 		//For white pawns, adding positions to the move grid.
 		//Isn't moved: pawn stays in the second row, can move on the 3rd, or on the 4th row
 		if(!m_isMoved) {
@@ -55,9 +73,25 @@ namespace ch {
 
 	bool Pawn::Move_Hit(const Position& pos) {
 		//Not moved, and steps 2 ahead, able to hit by En Passant
-		if(!m_isMoved) {
-			//pos.getRow()
+		if(!m_isMoved) { 
+			//****White, and stepping on the 4th row.
+			if ((m_color == Color::WHITE) && (pos.getRow() == 4)) {
+				if(Piece::Move_Hit(pos)) { //It means, it could move, and it is moved.
+					m_canBeEnPass = true;
+					return true; //Move complete
+				}
+				return false; //Got some nasty position, like B2 to C4 (When column mismatches)
+			}
+			//****Black, and stepping on the 5th row.
+			else if(pos.getRow() == 5) {
+				if(Piece::Move_Hit(pos)) { //It means, it could move, and it is moved.
+					m_canBeEnPass = true;
+					return true; //Move complete
+				}
+				return false;
+			}
 		}
-		return true;
+		//Other cases: Just move, and look
+		return Piece::Move_Hit(pos);
 	}
 }
