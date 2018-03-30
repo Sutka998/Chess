@@ -2,19 +2,29 @@
 #include <stdexcept>
 
 namespace ch {
-	Position::Position (Column column, unsigned short row) : m_column(column) {
-		setRow(row);
+	
+	Position::Position (const Coords& coords) : m_coords(coords) {
+		setRow(coords.row);
 	}
 
 	void Position::setRow(unsigned short row) {
 		if(row >= 1 && row <= 8) {
-			m_row = row;
+			m_coords.row = row;
 		}
-		throw std::invalid_argument("Row should be between 1 and 8");
+		throw std::invalid_argument("The row should be between 1 and 8");
 	}
 
-	void Position::setPosition(Column column, unsigned short row) {
-		setColumn(column);
-		setRow(row);
+	void Position::setPosition(Coords c) {
+		setColumn(c.column);
+		setRow(c.row);
 	}
+
+	bool Position::operator==(const Position& that) const{
+		return this->getCoords() == that.getCoords();
+	}
+
+	bool Coords::operator==(const Coords& that) const {
+		return (this->column == that.column) && (this->row == that.row);
+	}
+
 }

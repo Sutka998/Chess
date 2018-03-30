@@ -1,8 +1,9 @@
 #pragma once
-class ChessEngine
-{
-public:
-	ChessEngine(void);
-	~ChessEngine(void);
-};
+namespace ch {
+	class ChessEngine {
+	public:
+		ChessEngine(void);
+		~ChessEngine(void);
+	};
 
+}

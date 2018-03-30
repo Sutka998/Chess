@@ -1,10 +1,12 @@
 #pragma once
 namespace ch {
-	class Game
-	{
+	class Game	{
+	private:
+		void Loop();
 	public:
-		Game(void);
-		~Game(void);
+		Game();
+		void Start();
+		~Game();
 	};
 
 }
