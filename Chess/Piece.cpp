@@ -14,8 +14,8 @@ namespace ch {
 		return false;
 	}
 
-	bool Piece::Move(const Position& pos) {
-		if(isInGrid(m_moveGrid, pos)) {
+	bool Piece::Move_Hit(const Position& pos) {
+		if(isInGrid(m_moveGrid, pos) || isInGrid(m_hitGrid, pos)) {
 			m_position = pos;
 			m_evalHitGrid(); //Moved, refreshing accessible tiles.
 			m_evalMoveGrid();
@@ -23,5 +23,4 @@ namespace ch {
 		}
 		return false;
 	}
-
 }

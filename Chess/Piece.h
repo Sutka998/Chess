@@ -22,8 +22,7 @@ namespace ch {
 		Piece(Color, const Position&);
 		static bool isInGrid(const std::vector<Position>&, const Position&);
 
-		bool Move(const Position&);
-		bool Hit(const Position&);
+		bool Move_Hit(const Position&);
 		const std::vector<Position>& getHitGrid() const {return m_hitGrid;}
 		const std::vector<Position>& getMoveGrid() const {return m_moveGrid;}
 
