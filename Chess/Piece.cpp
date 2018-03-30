@@ -2,10 +2,24 @@
 
 namespace ch {
 	
-	bool Piece::isInGrid(const std::vector<Coords>& m_grid, const Position& pos)
+	Piece::Piece(Color color, const Position& position) 
+		: m_color(color), m_isMoved(false), m_position(position) {
+	}
+
+	bool Piece::isInGrid(const std::vector<Position>& m_grid, const Position& pos)
 	{
-		for (auto iter = m_grid.begin(); iter != m_grid.end(); iter++)	{
-			if(*iter == pos.getCoords()) return true;
+		for (auto iter = m_grid.begin(); iter != m_grid.end(); iter++)	{ 
+			if(*iter == pos) return true;
+		}
+		return false;
+	}
+
+	bool Piece::Move(const Position& pos) {
+		if(isInGrid(m_moveGrid, pos)) {
+			m_position = pos;
+			m_evalHitGrid(); //Moved, refreshing accessible tiles.
+			m_evalMoveGrid();
+			return true;
 		}
 		return false;
 	}

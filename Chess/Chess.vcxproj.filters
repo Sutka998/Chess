@@ -30,7 +30,7 @@
     <ClCompile Include="ChessEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="position.cpp">
+    <ClCompile Include="Position.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,8 +47,8 @@
     <ClInclude Include="ChessEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="position.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Position.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

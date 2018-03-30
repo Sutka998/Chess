@@ -1,30 +1,32 @@
-#include "position.h"
+#include "Position.h"
 #include <stdexcept>
 
 namespace ch {
 	
-	Position::Position (const Coords& coords) : m_coords(coords) {
-		setRow(coords.row);
+	Position::Position (Column c, unsigned short row) 
+		: m_column(c) {
+		setRow(row); //Row should be validated. Should be between 1 and 8.
 	}
 
 	void Position::setRow(unsigned short row) {
 		if(row >= 1 && row <= 8) {
-			m_coords.row = row;
+			m_row = row;
 		}
 		throw std::invalid_argument("The row should be between 1 and 8");
 	}
 
-	void Position::setPosition(Coords c) {
-		setColumn(c.column);
-		setRow(c.row);
+	void Position::setPosition(Column column, unsigned short row) {
+		m_column = column;
+		setRow(row);
 	}
 
 	bool Position::operator==(const Position& that) const{
-		return this->getCoords() == that.getCoords();
+		return
+			(this->getColumn() == that.getColumn())
+			&&
+			(this->getRow()) == that.getRow();
 	}
 
-	bool Coords::operator==(const Coords& that) const {
-		return (this->column == that.column) && (this->row == that.row);
-	}
+
 
 }
