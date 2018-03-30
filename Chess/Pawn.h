@@ -1,11 +1,14 @@
 #pragma once
+#include "Piece.h"
 namespace ch {
 
-class Pawn
-{
-public:
-	Pawn(void);
-	~Pawn(void);
-};
+	class Pawn : public Piece
+	{
+	private:
+
+	public:
+		Pawn(void);
+		~Pawn(void);
+	};
 
 }
