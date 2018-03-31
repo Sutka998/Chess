@@ -65,8 +65,8 @@ namespace ch {
 		if(!m_isMoved) {
 			m_moveGrid.push_back(Position(m_position.getColumn(), 3)); //3rd
 			m_moveGrid.push_back(Position(m_position.getColumn(), 4)); //4th
-		} //If it is moved, and not staying on the 8th row:
-		else if (m_position.getRow() != 8){
+		} //If it is moved. Can't stay in the 8th row, because it would be swapped.
+		else {
 			//It can step on the next row only.
 			m_moveGrid.push_back(Position(m_position.getColumn(), m_position.getRow()+1));
 		}
@@ -76,8 +76,8 @@ namespace ch {
 		if(!m_isMoved) {
 			m_moveGrid.push_back(Position(m_position.getColumn(), 6)); //3rd from the 8th
 			m_moveGrid.push_back(Position(m_position.getColumn(), 5)); //4th from the 8th
-		}
-		else if (m_position.getRow() != 1){
+		} //If it is moved. Can't stay in the 1st row, because it would be swapped.
+		else{
 			//It can step on the next row only. Decrementing step, from the start row.
 			m_moveGrid.push_back(Position(m_position.getColumn(), m_position.getRow()-1));
 		}

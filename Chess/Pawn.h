@@ -15,5 +15,4 @@ namespace ch {
 		Pawn(Color, const Position&);
 		bool Pawn::Move_Hit(const Position&);
 	};
-
 }
