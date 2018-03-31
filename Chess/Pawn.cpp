@@ -28,18 +28,15 @@ namespace ch {
 	void Pawn::m_evalHitGrid() {
 		if(m_hGridEvaled) { return;} //Its evaluated since the last step
 		if(m_color == Color::WHITE) { //***WHITE, incrementing coordinates
-			if(m_position.getColumn() == Column::A) {
-				m_hitGrid.push_back(Position(Column::B, m_position.getRow()+1));
+			if(m_position.getColumn() == Column::CL::A) {
+				m_hitGrid.push_back(Position(Column::CL::B, m_position.getRow()+1));
 			}
-			else if(m_position.getColumn() == Column::H) {
-				m_hitGrid.push_back(Position(Column::G, m_position.getRow()+1));
+			else if(m_position.getColumn() == Column::CL::H) {
+				m_hitGrid.push_back(Position(Column::CL::G, m_position.getRow()+1));
 			}
 			else {
 				Column c = m_position.getColumn();
-				int a = static_cast<int>(c);
-				a--;
-				c = static_cast<Column>(a);
-				m_hitGrid.push_back(Position(Column::G, m_position.getRow()+1));
+				m_hitGrid.push_back(Position(Column::CL::G, m_position.getRow()+1));
 			}
 		} 
 		else {//***BLACK
