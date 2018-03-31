@@ -25,6 +25,8 @@ namespace ch {
 
 		const Column& operator=(const Column&);
 		bool operator==(const Column&) const;
+		Column operator+(unsigned short) const;
+		Column operator-(unsigned short) const;
 	};
 
 	class Position {

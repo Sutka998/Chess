@@ -40,6 +40,18 @@ namespace ch {
 		throw std::invalid_argument("Column number should be between 1 and 8.");
 	}
 
+	Column Column::operator-(unsigned short num) const {
+		Column c(*this);
+		c.set(c.m_number-num);
+		return c;
+	}
+
+	Column Column::operator+(unsigned short num) const {
+		Column c(*this);
+		c.set(c.m_number+num);
+		return c;
+	}
+
 	bool Column::operator==(const Column& that) const{
 		return this->m_number == that.m_number;
 	}

@@ -27,21 +27,36 @@ namespace ch {
 	}
 	void Pawn::m_evalHitGrid() {
 		if(m_hGridEvaled) { return;} //Its evaluated since the last step
-		if(m_color == Color::WHITE) { //***WHITE, incrementing coordinates
-			if(m_position.getColumn() == Column::CL::A) {
+		m_hitGrid.clear();
+
+		if(m_color == Color::WHITE && m_position.getRow() != 8) { //***WHITE, incrementing coordinates
+			const Column c = m_position.getColumn();
+			if(c == Column::CL::A) {//Left column
 				m_hitGrid.push_back(Position(Column::CL::B, m_position.getRow()+1));
 			}
-			else if(m_position.getColumn() == Column::CL::H) {
+			else if(c == Column::CL::H) {//Right column
 				m_hitGrid.push_back(Position(Column::CL::G, m_position.getRow()+1));
 			}
-			else {
-				Column c = m_position.getColumn();
-				m_hitGrid.push_back(Position(Column::CL::G, m_position.getRow()+1));
+			else {//Not side
+				m_hitGrid.push_back(Position(c - 1, m_position.getRow()+1));
+				m_hitGrid.push_back(Position(c + 1, m_position.getRow()+1));
 			}
 		} 
-		else {//***BLACK
-
+		else if(m_color == Color::BLACK && m_position.getRow() != 1) {//***BLACK
+			const Column c = m_position.getColumn();
+			if(c == Column::CL::A) {//Left column
+				m_hitGrid.push_back(Position(Column::CL::B, m_position.getRow()-1));
+			}
+			else if(c == Column::CL::H) {//Right column
+				m_hitGrid.push_back(Position(Column::CL::G, m_position.getRow()-1));
+			}
+			else {//Not side
+				m_hitGrid.push_back(Position(c - 1, m_position.getRow()-1));
+				m_hitGrid.push_back(Position(c + 1, m_position.getRow()-1));
+			}
 		}
+		m_hGridEvaled = true;
+		return;
 	}
 
 	void Pawn::m_mGridAdd_white() {
@@ -89,6 +104,7 @@ namespace ch {
 			}
 		}
 		//Other cases: Just move, and look
+		m_canBeEnPass = false;
 		return Piece::Move_Hit(pos);
 	}
 }
