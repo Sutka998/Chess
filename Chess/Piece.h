@@ -40,5 +40,4 @@ namespace ch {
 		bool isMoved() const {return m_isMoved;}
 		Color getColor() const {return m_color;}
 	};
-
 }
