@@ -6,7 +6,7 @@ namespace ch {
 	enum class Color {
 		BLACK, WHITE
 	};
-	enum class PieceName {
+	enum class PieceType {
 		PAWN, BISHOP, KNIGHT, ROOK, QUEEN, KING
 	};
 	enum class MovType{
@@ -37,13 +37,10 @@ namespace ch {
 		std::vector<Position> m_hitGrid;
 		std::vector<Position> m_moveGrid;
 	public:
-		const PieceName pieceType;
-		Piece(Color, const Position&, PieceName);
-
-
+		const static PieceType pieceType;
+		Piece(Color, const Position&);
 
 		bool canMoveHit(const Position&, MovType) const;
-		bool canHit(const Position&) const;
 		virtual void Move_Hit(const Position&);
 
 		//Getters

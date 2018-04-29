@@ -2,9 +2,9 @@
 
 namespace ch {
 	
-	Piece::Piece(Color color, const Position& position, PieceName pn) 
-		: m_color(color), m_position(position), pieceType(pn), 
-		m_isMoved(false), m_mGridEvaled(false), m_hGridEvaled(false), m_isCacheValid(false)
+	Piece::Piece(Color color, const Position& position) 
+		: m_color(color), m_position(position),	m_isMoved(false),
+		m_mGridEvaled(false), m_hGridEvaled(false), m_isCacheValid(false)
 	{}
 
 	bool Piece::canMoveHit(const Position& pos, MovType mvtyp) const {
@@ -29,7 +29,6 @@ namespace ch {
 		}
 		return false;
 	}
-
 	void Piece::m_move(const Position& pos) {
 		m_position = pos;
 		m_mGridEvaled = m_hGridEvaled = false;//The grids no longer evaluated, it needs to be false, for refreshing the grids.
@@ -41,6 +40,7 @@ namespace ch {
 	void Piece::Move_Hit(const Position& pos) {
 		if(canMoveHit(pos, MovType::HIT) || canMoveHit(pos, MovType::MOVE)) {
 			m_move(pos);
+			m_isMoved = true; //We moved the piece.
 			return;
 		}
 		throw std::invalid_argument("Position is not in the grid. Unable to move the piece.");
