@@ -2,11 +2,13 @@
 namespace ch {
 
 	Pawn::Pawn(Color color, const Position& pos)
-		: Piece(color, pos, PieceName::PAWN), m_canBeEnPass(false)
+		: Piece(color, pos), m_canBeEnPass(false)
 	{
 		m_evalMoveGrid(); //It should be done here, for the first time.
 		m_evalHitGrid();
 	}
+
+	const PieceType Pawn::pieceType = PieceType::PAWN;
 
 	void Pawn::m_evalMoveGrid() {
 		//We evaluated it since the last step
@@ -90,28 +92,26 @@ namespace ch {
 		}
 	}
 
-	bool Pawn::Move_Hit(const Position& pos) {
-		//Not moved, and steps 2 ahead, able to hit by En Passant
-		if(!m_isMoved) { 
-			//****White, and stepping on the 4th row.
-			if ((m_color == Color::WHITE) && (pos.getRow() == 4)) {
-				if(Piece::Move_Hit(pos)) { //It means, it could move, and it is moved.
-					m_canBeEnPass = true;
-					return true; //Move complete
+	void Pawn::Move_Hit(const Position& pos) {
+		
+		if(canMoveHit(pos, MovType::MOVE)){
+			if(!m_isMoved) { //If not moved, and steps 2 ahead, it is able to hit by En Passant
+				//****White, and stepping on the 4th row.
+				if ((m_color == Color::WHITE) && (pos.getRow() == 4)) {
+					m_canBeEnPass = true; //We are moving in the 4th row
+					m_isMoved = true;
+					return; //Move complete
 				}
-				return false; //Got some nasty position, like B2 to C4 (When column mismatches)
-			}
-			//****Black, and stepping on the 5th row.
-			else if(pos.getRow() == 5) {
-				if(Piece::Move_Hit(pos)) { //It means, it could move, and it is moved.
+				//****Black, and stepping on the 5th row.
+				else if(pos.getRow() == 5) {
 					m_canBeEnPass = true;
-					return true; //Move complete
+					m_isMoved = true;
+					return; //Move complete
 				}
-				return false;
 			}
 		}
-		//Other cases: Just move, and look
-		m_canBeEnPass = false;
-		return Piece::Move_Hit(pos);
+		//Other cases: When the piece is already moved, or moving/hitting differently:
+		m_canBeEnPass = false; //
+		Piece::Move_Hit(pos);
 	}
 }

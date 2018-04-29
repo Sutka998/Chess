@@ -30,7 +30,7 @@ namespace ch {
 	//////////////////////////////////////////////////////////////////////////
 	void Column::set(CL cl) {
 		m_letter = cl;
-		m_number = static_cast<int>(cl);
+		m_number = static_cast<unsigned short>(cl);
 	}
 	void Column::set(unsigned short number) {
 		if(number <= 8 && number >= 1) {

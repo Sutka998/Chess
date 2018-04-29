@@ -12,7 +12,7 @@ namespace ch {
 		unsigned short m_number;
 	public:
 		Column(CL letter) 
-			: m_letter(letter), m_number(static_cast<int>(letter)),
+			: m_letter(letter), m_number(static_cast<unsigned short>(letter)),
 			letter(m_letter), number(m_number)
 		{}
 		Column(unsigned short number) : letter(m_letter), number(m_number)

@@ -16,6 +16,6 @@ namespace ch {
 		bool m_canBeEnPass;
 	public:
 		Pawn(Color, const Position&);
-		bool Pawn::Move_Hit(const Position&);
+		void Move_Hit(const Position&);
 	};
 }
