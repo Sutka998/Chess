@@ -11,13 +11,30 @@ namespace ch {
 	}
 
 	void Board::deletePieceAt(const Position& pos) {
-		Piece* piecPos = m_at(pos);
-		delete piecPos;
-		piecPos = nullptr;
+		Piece*& piecPtr = m_at(pos);
+		try{
+			if(piecPtr != nullptr) {
+				std::vector<Piece*>& piecesV = (piecPtr->getColor() == Color::WHITE)? m_whitePieces : m_blackPieces;
+				for(auto it = piecesV.begin(); it != piecesV.end(); it++) {
+					if((*it) == piecPtr) {//The piece's pointer found in the piece list
+						piecesV.erase(it);
+						break;
+					}
+					throw std::logic_error("The piece that should be deleted is not in the vector Board::deletePieceAt");
+				}
+			}
+		}
+		catch(...){
+			delete piecPtr;
+			piecPtr = nullptr;
+			throw;
+		}
+		delete piecPtr;
+		piecPtr = nullptr;
 	}
 
 	void Board::movePiece(const Position& from, const Position& dest) {
-		Piece* destPtr = m_at(dest);
+		Piece*& destPtr = m_at(dest);
 		if(destPtr == nullptr) {
 			Piece* fromPtr = m_at(from);
 			destPtr = fromPtr;
@@ -25,10 +42,6 @@ namespace ch {
 			return;
 		}
 		throw std::logic_error("Destination is not nullptr.");
-	}
-
-	const ch::Piece* Board::getPieceAt(const Position& pos) const {
-		return m_at(pos);
 	}
 
 	Board::~Board() {

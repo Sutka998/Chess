@@ -36,6 +36,7 @@ namespace ch {
 		if(number <= 8 && number >= 1) {
 			m_number = number;
 			m_letter = static_cast<CL>(number);
+			return;
 		}
 		throw std::invalid_argument("Column number should be between 1 and 8.");
 	}
