@@ -21,6 +21,7 @@ namespace ch {
 		bool m_isInGrid(MovType, const Position&) const;
 
 		void m_move(const Position&);
+		std::vector<Position> m_notCheckGrid;
 	protected:
 		//Have hitGrid, or moveGrid been evaluated since the last step
 		bool m_mGridEvaled;
@@ -37,6 +38,7 @@ namespace ch {
 		std::vector<Position> m_hitGrid;
 		std::vector<Position> m_moveGrid;
 	public:
+		std::vector<Position>& noCheckGrid;
 		const static PieceType pieceType;
 		Piece(Color, const Position&);
 

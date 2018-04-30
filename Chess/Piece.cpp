@@ -3,7 +3,7 @@
 namespace ch {
 	
 	Piece::Piece(Color color, const Position& position) 
-		: m_color(color), m_position(position),	m_isMoved(false),
+		: m_color(color), m_position(position),	m_isMoved(false), noCheckGrid(m_notCheckGrid),
 		m_mGridEvaled(false), m_hGridEvaled(false), m_isCacheValid(false)
 	{}
 
@@ -43,6 +43,6 @@ namespace ch {
 			m_isMoved = true; //We moved the piece.
 			return;
 		}
-		throw std::invalid_argument("Position is not in the grid. Unable to move the piece.");
+		throw std::invalid_argument("Piece::Move_Hit Position is not in the grid. Unable to move the piece.");
 	}
 }
