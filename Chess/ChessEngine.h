@@ -19,8 +19,29 @@ namespace ch {
 		const King& m_whiteKing;
 		const King& m_blackKing;
 
-		void m_calcNoCheckGrid();
-		bool m_isKingInCheck(const Position& targetPos, const Position& currPos);
+		class lineITER {
+		public:
+			enum class iterDIR{UP = 0, DOWN = 1, RIGHT = 2, LEFT=3, UPRIGHT=4, UPLEFT=5, DOWNRIGHT=6, DOWNLEFT=7};
+			lineITER(iterDIR iteratorDirection, const Position& start)
+				: m_iterDirection(iteratorDirection), m_currPos(start)
+			{}
+			bool isFinished() const {return m_finished;	}
+			void operator++(int);
+			const Position& operator*() const { return m_currPos; }
+			const Position& getCurrentPosition() { return m_currPos; }
+			iterDIR getIterDirection() const {return m_iterDirection;}
+		private:
+			const iterDIR m_iterDirection;
+			bool m_finished;
+			Position m_currPos;
+		};
+
+		void m_calcWhereCanStep();
+		bool m_isKingInCheck(const Position& targetPos, const Position& currPos) { //TODO
+			return true;
+		}
+		void m_calcNoCheckGrid(King*);
+		bool m_dirCalculation(std::vector<Position>& checkLine, const Position& kingPos, const Position& currPos);
 
 		bool m_activeCheck;
 
@@ -30,7 +51,7 @@ namespace ch {
 		Pawn* m_delEnPassCache; //EnPass able pawn stored here, deleted in the next round
 		Board& m_Board;
 	public:
-		ChessEngine(Board& chessBoard);
+		ChessEngine(Board& chessBoard, const King& whiteKing, const King& blackKing);
 		bool ProcessStep(const Position& src, const Position& dst);
 		const Color& getCurrentColor();
 		~ChessEngine(void);

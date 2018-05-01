@@ -38,7 +38,9 @@ namespace ch {
 		std::vector<Position> m_hitGrid;
 		std::vector<Position> m_moveGrid;
 	public:
-		std::vector<Position>& noCheckGrid;
+		std::vector<Position>& noCheckGrid; //Finally the piece should step on these (check rule)
+		bool noCheckG_isnotapplied; //When the noCheckGrid is empty, because there are no restriction (hit/move grid is valid)
+
 		const static PieceType pieceType;
 		Piece(Color, const Position&);
 

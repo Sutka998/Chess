@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 namespace ch {
 
@@ -45,4 +46,17 @@ namespace ch {
 		//Operators
 		bool operator==(const Position& that) const;
 	};
+
+	//Returns the intersection of two vectors
+	template<class T>
+	void vectorIntSect(const std::vector<T>& inA, const std::vector<T>& inB, std::vector<T>& out) {
+		for (auto iterA = inA.begin(); iterA != inA.end(); iterA++) {
+			for (auto iterB = inB.begin(); iterB != inB.end(); iterB++) {
+				if((*iterA) == (*iterB)) {
+					out.push_back(*iterA);
+					break;
+				}
+			}
+		}
+	}
 }

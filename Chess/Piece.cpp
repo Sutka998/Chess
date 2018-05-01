@@ -41,6 +41,7 @@ namespace ch {
 		if(canMoveHit(pos, MovType::HIT) || canMoveHit(pos, MovType::MOVE)) {
 			m_move(pos);
 			m_isMoved = true; //We moved the piece.
+			m_isCacheValid = false; //After move, the position cache is no longer valid.
 			return;
 		}
 		throw std::invalid_argument("Piece::Move_Hit Position is not in the grid. Unable to move the piece.");
