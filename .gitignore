@@ -17,6 +17,7 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
+*.sdf
 [Bb]in
 [Dd]ebug*/
 *.lib
@@ -28,7 +29,6 @@ _ReSharper*/
 *.vssscc
 $tf*/
 SFML-2.4.2/*
-*.sdf
 Chess.opensdf
 ._Chess.sdf1
 ._Chess.sdf2
