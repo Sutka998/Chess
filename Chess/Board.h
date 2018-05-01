@@ -60,7 +60,7 @@ namespace ch {
 		void deletePieceAt(const Position&);
 
 		void movePiece(const Position& from, const Position& dest);
-		const Piece* getPieceAt(const Position& pos) const {
+		Piece* getPieceAt(const Position& pos) const {
 			return m_pieceArray[pos.getRow()*8 + pos.getColumn().number];
 		}
 		

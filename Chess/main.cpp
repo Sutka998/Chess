@@ -2,6 +2,7 @@
 #include "position.h"
 
 #include "Piece.h"
+#include "Pawn.h"
 #include "position.h"
 #include <iostream>
 #include <list>
@@ -35,15 +36,15 @@ namespace ch{
 		void operator+=(_FPtr fvP){
 			m_toCall.push_back(fvP);
 		}
-
+		
 	};
 }
 void abc(int a) {
 	std::cout<<"Az int: "<< a<<std::endl;
 }
 
+using namespace ch;
 int main(){	
-	
 	/*ch::Event<void(*)(int)> e;
 	e+=abc;
 	int x = 12;
