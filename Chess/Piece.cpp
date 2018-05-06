@@ -3,7 +3,7 @@
 namespace ch {
 	
 	Piece::Piece(Color color, const Position& position) 
-		: m_color(color), m_position(position),	m_isMoved(false), noCheckGrid(m_notCheckGrid),
+		: m_color(color), m_position(position),	m_isMoved(false), 
 		m_mGridEvaled(false), m_hGridEvaled(false), m_isCacheValid(false)
 	{}
 
