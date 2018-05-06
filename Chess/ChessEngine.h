@@ -12,7 +12,9 @@ namespace ch {
 			return ((piece != nullptr) && (piece->getColor() == m_currCol)); //If there is a piece, and it's color is ok
 		}
 		//Checking for castling, en Passant, or pawn swap
-		bool m_specStepProcess(const Position& src, const Position& dest);
+		bool m_castlingCheck(const Position& src, const Position& dest);
+		bool m_tryStepExecute(const Position& src, const Position& dest, MovType mvType);
+		bool m_enPassantCheck(const Position& src, const Position& dest);
 		//Checks whether the way is free to the dest. Does not include destination.
 		bool m_isWayFree(const Position& src, const Position& dest);
 
@@ -36,12 +38,15 @@ namespace ch {
 			Position m_currPos;
 		};
 
-		void m_calcWhereCanStep();
-		bool m_isKingInCheck(const Position& targetPos, const Position& currPos) { //TODO
-			return true;
-		}
-		void m_calcNoCheckGrid(King*);
-		bool m_dirCalculation(std::vector<Position>& checkLine, const Position& kingPos, const Position& currPos);
+		struct intPair{
+			int a;
+			int b;
+		};
+
+		bool m_checkStraightDir(const Position& currPos, int& alliedPieces, const King& currKing); //When returns true, the outer loop should be broken.
+		void m_checkKnightDir(const King& currKing);
+		void m_checkEvaluate();
+		bool m_checkForMate();
 
 		bool m_activeCheck;
 

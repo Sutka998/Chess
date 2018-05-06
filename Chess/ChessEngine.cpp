@@ -3,8 +3,44 @@
 
 namespace ch {
 
-	bool ChessEngine::m_specStepProcess(const Position& src, const Position& dest) {
-		auto srcPiece = m_Board.getPieceAt(src);
+	ChessEngine::ChessEngine(Board& chessBoard, const King& whiteKing, const King& blackKing)
+		: m_Board(chessBoard), m_whiteKing(whiteKing), m_blackKing(blackKing)
+	{
+		m_Board.save();
+	}
+
+	bool ChessEngine::ProcessStep(const Position& src, const Position& dst) {
+		Piece* srcPiece = m_Board.getPieceAt(src);
+		Piece* dstPiece= m_Board.getPieceAt(dst);
+		if(srcPiece == nullptr) {
+			return false; //no piece
+		}
+		if(srcPiece->getColor() != m_currCol) {
+			return false; //wrong color
+		}
+		if(m_castlingCheck(src, dst) == true) {
+			return true; //Spec. step processed
+		}
+		if(srcPiece->pieceType == PieceType::KNIGHT) {
+
+		}
+		if(m_isWayFree(src, dst)) {
+			if(srcPiece->canMoveHit(dst, MovType::MOVE)) {
+				if(dstPiece != nullptr) {
+					return false; //Invalid step
+				}
+			} 
+			else if(srcPiece->canMoveHit(dst, MovType::HIT))  {
+				if(dstPiece == nullptr || dstPiece->pieceType ==  PieceType::KING) {
+					return false; //We can not hit the nothing, or we can not hit the king
+				}
+
+			}
+		}
+	}
+
+	bool ChessEngine::m_castlingCheck(const Position& src, const Position& dest) {
+		Piece* srcPiece = m_Board.getPieceAt(src);
 		//Castling check and process
 		if((m_currCol == Color::WHITE && !m_whiteCastled) || (m_currCol == Color::BLACK && !m_blackCastled)) { //There is ability to castle
 			if(srcPiece->pieceType == PieceType::KING) { //King is chosen
@@ -16,6 +52,37 @@ namespace ch {
 				}				
 			}
 		}
+
+		return true;
+	}
+
+	bool ChessEngine::m_tryStepExecute(const Position& src, const Position& dest, MovType mvType) {
+		Piece* srcPiece = m_Board.getPieceAt(src);
+		if(mvType == MovType::MOVE) {
+			m_Board.movePiece(src, dest);
+		} else {
+			m_Board.deletePieceAt(dest);
+			m_Board.movePiece(src, dest);
+		}
+		m_checkEvaluate(); //The step was completed on the board, checking for check
+		if(m_activeCheck) {
+			m_Board.undo(); 
+			return false; //Invalid step
+		} else {
+			srcPiece->Move_Hit(dest); //Completing the move/hit by moving the piece to the destination
+		}
+		//Move completed
+		if(srcPiece->pieceType == PieceType::PAWN) {
+			//We moved a W pawn from the 7th, or a B pawn from the 2nd row => pawn swap
+			if((m_currCol == Color::WHITE && src.getRow() == 7) || (m_currCol == Color::BLACK && src.getRow() == 2)) {
+				//Valid pawn swap
+				//Event should be triggered //TODO
+				PieceType p;
+				m_Board.deletePieceAt(dest); //Remove our pawn
+				m_Board.placePieceAt(m_currCol, dest, p); //Replacing with the asked piece		
+				//Valid step happened
+			}
+		}
 		return true;
 	}
 
@@ -23,93 +90,71 @@ namespace ch {
 		return true;
 	}
 
-	void ChessEngine::m_calcWhereCanStep() {
-		const King& cCKing = (m_currCol == Color::WHITE)? m_whiteKing : m_blackKing;
-		cCKing.noCheckGrid.clear(); //Clearing it's grid first
-		if (!m_activeCheck){ //The current player is not in check
-			auto mvGridKing = cCKing.getMoveGrid();
-			//For the KING
-			for (auto it = mvGridKing.begin(); it < mvGridKing.end(); it++) {
-				if(!m_isKingInCheck(*it, cCKing.getPosition())) { //When the king is not in check, iterating through the move grid
-					cCKing.noCheckGrid.push_back(*it); //Then it can move on that position
-				}
-			}
-			//Direction checking
-
-			//For the others
-			auto currIter = (m_currCol == Color::WHITE)? m_Board.it_whitesBegin() : m_Board.it_blacksBegin();
-			auto endIter = (m_currCol == Color::WHITE)? m_Board.it_whitesEnd() : m_Board.it_blacksEnd();
-			for (; currIter != endIter; currIter++) { //Going through the current player's pieces
-				if((*currIter)->pieceType != PieceType::KING) { //Not king
-
-				}
-			}
-		}
-	}
-
-	void ChessEngine::m_calcNoCheckGrid(King* currKing) { //Lines, where one allied piece blocks from check
-		//Straight directions
-		std::vector<Position> checkLine; //The line, or the field from where the check comes
-		Position kingPos = currKing->getPosition();
-
-		for (int Index = 0; Index < 8 ; Index++) {
-			lineITER::iterDIR iterDirection = static_cast<lineITER::iterDIR>(Index);
-			lineITER it(iterDirection, kingPos);
-			it++; //We are starting the process from the next field, so we increase it once
-			while(!it.isFinished()){
-				const Position& currPos = *it;
-				if(m_dirCalculation(checkLine, kingPos, currPos)){
-					break;
-				}
-				it++;
-			}
-		}
-	}
-
-	bool ChessEngine::m_dirCalculation(std::vector<Position>& checkLine, const Position& kingPos, const Position& currPos) {
-		std::vector<Piece*> alliedPieces;
-		std::vector<Position> linePositions;
+	bool ChessEngine::m_checkStraightDir(const Position& currPos, int& alliedPieces, const King& currKing) {
 		Piece* currPiece = m_Board.getPieceAt(currPos);
-		linePositions.push_back(currPos); //Saving positions till the first black(included) (or end of the board)
 		if((currPiece != nullptr)) {
 			if(currPiece->getColor() == m_currCol) { //Allied piece
-				alliedPieces.push_back(currPiece);
+				alliedPieces++;
 				return false;
 			} 
-			else if(alliedPieces.size()>1) { //Enemy piece found, and more than one allied pieces were found between
-				for (int i = 0; i < alliedPieces.size() ; i++) {
-					alliedPieces[i]->noCheckG_isnotapplied = true; //They can move, where they want, there is no check-grid restriction applied
-				}
-			}
-			else if(alliedPieces.size() == 1) { //One allied piece found: It should move on line. Applying noCheckGrid 
-				if(currPiece->canMoveHit(kingPos, MovType::HIT)) { //When that one piece blocks from check (enemy piece can hit the king, without allied)
-					alliedPieces[0]->noCheckG_isnotapplied = false; //We evaluate the check grid
-					alliedPieces[0]->noCheckGrid.clear();
-					vectorIntSect(alliedPieces[0]->getMoveGrid(), linePositions, alliedPieces[0]->noCheckGrid); //Intersecting movgrid with the line
-					vectorIntSect(alliedPieces[0]->getHitGrid(), linePositions, alliedPieces[0]->noCheckGrid); //Intersecting hitgrid with the line
-				}
-				else { //If can't hurt our king, there is no movement restriction
-					alliedPieces[0]->noCheckG_isnotapplied = true;
-				}
+			else if(alliedPieces > 0) { //Enemy piece found, and allied pieces were found between
+				return true; //No check from this direction, enemy piece was found, loop should be broken.
 			}
 			else { //No allied piece was between, the king can be in check
-				if(currPiece->canMoveHit(kingPos, MovType::HIT)) { //Check from line direction
-					m_activeCheck = true; //The player is in check
-					checkLine = linePositions; //Saving the check line
+				if (m_Board.getPieceAt(currPos)->canMoveHit(currKing.getPosition(), MovType::HIT)) { //If the enemy piece can hit our king
+					//It is check then
+					m_activeCheck = true;		 
 				}
-				m_activeCheck = false;
+				return true; //Check - no check evaluated. The outer loop should be broken.
 			}
-			return true; //Enemy piece was found, for loop should be broken;
 		}
 		return false; //Nothing was found, continuing the loop
-
 	}
 
-	ChessEngine::ChessEngine(Board& chessBoard, const King& whiteKing, const King& blackKing)
-		: m_Board(chessBoard), m_whiteKing(whiteKing), m_blackKing(blackKing)
-	{
+	void ChessEngine::m_checkKnightDir(const King& currKing) {
+		//8 different directions to check
+		intPair argArray[8] = {{1,2}, {-1, 2}, {2, 1}, {2, -1}, {1,-2}, {-1, -2}, {-2, 1}, {-2, -1}};
+		// North right-left ; east up-down ; south right-left ; west up-down
+		const Position& kingPos = currKing.getPosition();
+		for (int i = 0; i < 8; i++) {
+			int cl = kingPos.getColumn().number;
+			int rw = kingPos.getRow();
+			if((cl+argArray[i].a >=1) && (cl+argArray[i].a <=8) //Valid column value
+				&& (rw+argArray[i].b >=1) && (rw+argArray[i].b <=8)) //Valid row value
+			{
+				//The position is valid
+				Position iterPos(kingPos.getColumn()+argArray[i].a, kingPos.getRow()+argArray[i].b);
+				if(m_Board.getPieceAt(iterPos)->pieceType == PieceType::KNIGHT &&
+					m_Board.getPieceAt(iterPos)->getColor() != m_currCol) //Enemy knight can hit our king
+				{ 
+					m_activeCheck = true; //King is in check
+					return;
+				}
+			}
+
+		}
 	}
 
+	void ChessEngine::m_checkEvaluate() {
+		m_activeCheck = false;
+		const King& currKing = (m_currCol == Color::WHITE) ? m_whiteKing : m_blackKing;
+		m_checkKnightDir(currKing);
+		if(m_activeCheck == true) {
+			return; //There is check found, we can return
+		}
+		int alliedPieces = 0;
+
+		for (int i = 0; i < 8; i++) {
+			auto iter = lineITER(static_cast<lineITER::iterDIR>(i), currKing.getPosition());
+			iter++;
+			for(; !iter.isFinished(); iter++) {
+				if(m_checkStraightDir((*iter), alliedPieces, currKing) == true) {
+					break;
+				}
+			}
+			alliedPieces = 0;
+		}
+	}
 
 	ChessEngine::~ChessEngine(void)
 	{
