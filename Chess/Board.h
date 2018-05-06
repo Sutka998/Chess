@@ -1,43 +1,62 @@
 #pragma once
 #include "Piece.h"
+#include "PiecesH.h"
 #include <vector>
 
 namespace ch {
 	class Board {
 		//0: A1, 1: A2 2: A3 ... 8: B1 ... 63: H8
 		Piece* m_pieceArray[64];
-		unsigned short m_whiteCount;
-		unsigned short m_blackCount;
+		Piece* m_savedArray[64];
 		Piece*& m_at(const Position& pos) {
 			return m_pieceArray[pos.getRow()*8 + pos.getColumn().number];//0th row, 0th column is the beginning
 		}
 		std::vector<Piece*> m_whitePieces;
 		std::vector<Piece*> m_blackPieces;
 
+		std::vector<Piece*> m_deleteList;
+
 		Board(const Board&);
 	public:
 		Board();
 
-		std::vector<ch::Piece*, std::allocator<ch::Piece*>>::iterator Board::it_whitesBegin() {
-			return m_whitePieces.begin();
+		std::vector<ch::Piece*, std::allocator<ch::Piece*>>::iterator it_Begin(Color color) {
+			return color == Color::WHITE ? m_whitePieces.begin() : m_blackPieces.begin();
 		}
-		std::vector<ch::Piece*, std::allocator<ch::Piece*>>::iterator Board::it_blacksBegin() {
-			return m_blackPieces.begin();
-		}
-		std::vector<ch::Piece*, std::allocator<ch::Piece*>>::iterator Board::it_whitesEnd() {
-			return m_whitePieces.end();
-		}
-		std::vector<ch::Piece*, std::allocator<ch::Piece*>>::iterator Board::it_blacksEnd() {
-			return m_blackPieces.end();
+		std::vector<ch::Piece*, std::allocator<ch::Piece*>>::iterator it_End(Color color) {
+			return color == Color::WHITE ? m_whitePieces.end() : m_blackPieces.end();
 		}
 
+		void save();
+		void undo();
 
-		template<class PIECE_T>
-		void placePieceAt(Color color, const Position& pos) {
-			Piece* posPtr = m_at(pos);
+		void placePieceAt(Color color, const Position& pos, PieceType pieceType) {
+			Piece*& posPtr = m_at(pos);
 			if(posPtr == nullptr) {
 				try {
-					posPtr = new PIECE_T(color, pos);
+					switch (pieceType)
+					{
+					case ch::PieceType::PAWN:
+						posPtr = new Pawn(color, pos);
+						break;
+					case ch::PieceType::BISHOP:
+						posPtr = new Bishop(color, pos);
+						break;
+					case ch::PieceType::KNIGHT:
+						posPtr = new Knight(color, pos);
+						break;
+					case ch::PieceType::ROOK:
+						posPtr = new Rook(color, pos);
+						break;
+					case ch::PieceType::QUEEN:
+						posPtr = new Queen(color, pos);
+						break;
+					case ch::PieceType::KING:
+						posPtr = new King(color, pos);
+						break;
+					default:
+						break;
+					}
 				}
 				catch(...) {
 					delete posPtr;
@@ -45,11 +64,9 @@ namespace ch {
 					throw;
 				}
 				if (color == Color::BLACK){
-					m_blackCount++;
 					m_blackPieces.push_back(posPtr);
 				}
 				else{
-					m_whiteCount++;
 					m_whitePieces.push_back(posPtr);
 				}
 				return;
@@ -60,10 +77,13 @@ namespace ch {
 		void deletePieceAt(const Position&);
 
 		void movePiece(const Position& from, const Position& dest);
-		Piece* getPieceAt(const Position& pos) const {
+		Piece* getPieceAt(const Position& pos) {
 			return m_pieceArray[pos.getRow()*8 + pos.getColumn().number];
 		}
-		
+		const Piece* getPieceAt(const Position& pos) const {
+			return m_pieceArray[pos.getRow()*8 + pos.getColumn().number];
+		}
+
 		~Board();
 	};
 }
