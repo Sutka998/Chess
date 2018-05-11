@@ -12,6 +12,7 @@ namespace ch {
 	bool ChessEngine::ProcessStep(const Position& src, const Position& dst) {
 		Piece* srcPiece = m_Board.getPieceAt(src);
 		Piece* dstPiece= m_Board.getPieceAt(dst);
+		bool validHappened = false;
 		if(srcPiece == nullptr) {
 			return false; //no piece
 		}
@@ -22,21 +23,36 @@ namespace ch {
 			return true; //Spec. step processed
 		}
 		if(srcPiece->pieceType == PieceType::KNIGHT) {
-
+			if(m_tryKnightStep(src, dst) == false) {
+				return false; //The knight step didn't complete
+			}
+			validHappened = true; //Knight step executed
 		}
-		if(m_isWayFree(src, dst)) {
-			if(srcPiece->canMoveHit(dst, MovType::MOVE)) {
-				if(dstPiece != nullptr) {
-					return false; //Invalid step
+		else if(m_isWayFree(src, dst)) {
+			if(dstPiece == nullptr) { //Moving, dest is empty
+				if(srcPiece->canMoveHit(dst, MovType::MOVE)) {
+					if (m_tryStepExecute(src, dst, MovType::MOVE) == false) { //Destination is nullptr
+						return false; //Invalid step
+					}
+					validHappened = true; //We have executed the move step
 				}
-			} 
-			else if(srcPiece->canMoveHit(dst, MovType::HIT))  {
-				if(dstPiece == nullptr || dstPiece->pieceType ==  PieceType::KING) {
-					return false; //We can not hit the nothing, or we can not hit the king
+			}
+			else if((dstPiece->getColor() != m_currCol) && (dstPiece->pieceType !=  PieceType::KING))  {
+				//Destination is enemy, and not the king
+				if(srcPiece->canMoveHit(dst, MovType::HIT)) { //Our piece is able to hit the enemy 
+					if(m_tryStepExecute(src, dst, MovType::HIT) == false) {
+						return false; 
+					}
+					validHappened = true; //Hit step executed
 				}
-
 			}
 		}
+
+		if (validHappened) { //When valid step happened, we have to save,
+			m_Board.save();
+			return true;
+		}
+			return false;
 	}
 
 	bool ChessEngine::m_castlingCheck(const Position& src, const Position& dest) {
@@ -71,7 +87,7 @@ namespace ch {
 		} else {
 			srcPiece->Move_Hit(dest); //Completing the move/hit by moving the piece to the destination
 		}
-		//Move completed
+		//Move completed, pawn swap check
 		if(srcPiece->pieceType == PieceType::PAWN) {
 			//We moved a W pawn from the 7th, or a B pawn from the 2nd row => pawn swap
 			if((m_currCol == Color::WHITE && src.getRow() == 7) || (m_currCol == Color::BLACK && src.getRow() == 2)) {
@@ -82,6 +98,34 @@ namespace ch {
 				m_Board.placePieceAt(m_currCol, dest, p); //Replacing with the asked piece		
 				//Valid step happened
 			}
+		}
+		return true;
+	}
+
+	bool ChessEngine::m_tryKnightStep(const Position& src, const Position& dest) {
+		Piece* currKnight = m_Board.getPieceAt(src);
+
+		if(currKnight->canMoveHit(dest, MovType::MOVE)) { //Move and hit grid is the same for the knight
+			if(m_Board.getPieceAt(dest) == nullptr) { //Destination is empty => moving the piece
+				m_Board.movePiece(src, dest);
+			}
+			else if(m_Board.getPieceAt(dest)->pieceType == PieceType::KING) { //We can't hit 
+				return false;//Invalid, we can't hit a king
+			}
+			else if(m_Board.getPieceAt(dest)->getColor() != m_currCol) { //Hitting enemy piece, if he is enemy colored.
+				m_Board.deletePieceAt(dest);
+				m_Board.movePiece(src, dest);
+			}
+			else {
+				return false; //Invalid step, trying to hit allied piece, or a king
+			}
+		}
+		else { return false;} //Not in the hit/move grid, invalid step.
+		//Check check
+		m_checkEvaluate();
+		if(m_activeCheck) {
+			m_Board.undo();
+			return false; //We got check, we can not step this way, and we have to undo.
 		}
 		return true;
 	}

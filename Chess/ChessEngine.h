@@ -14,6 +14,7 @@ namespace ch {
 		//Checking for castling, en Passant, or pawn swap
 		bool m_castlingCheck(const Position& src, const Position& dest);
 		bool m_tryStepExecute(const Position& src, const Position& dest, MovType mvType);
+		bool m_tryKnightStep(const Position& src, const Position& dest);
 		bool m_enPassantCheck(const Position& src, const Position& dest);
 		//Checks whether the way is free to the dest. Does not include destination.
 		bool m_isWayFree(const Position& src, const Position& dest);
