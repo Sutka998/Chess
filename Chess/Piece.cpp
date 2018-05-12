@@ -2,8 +2,8 @@
 
 namespace ch {
 	
-	Piece::Piece(Color color, const Position& position) 
-		: m_color(color), m_position(position),	m_isMoved(false), 
+	Piece::Piece(Color color, const Position& position, PieceType pcType) 
+		: m_color(color), m_position(position),	m_isMoved(false), pieceType(pcType),
 		m_mGridEvaled(false), m_hGridEvaled(false), m_isCacheValid(false)
 	{}
 

@@ -2,7 +2,7 @@
 namespace ch {
 
 	Pawn::Pawn(Color color, const Position& pos)
-		: Piece(color, pos), m_canBeEnPass(false)
+		: Piece(color, pos, PieceType::PAWN), m_canBeEnPass(false)
 	{
 		m_evalMoveGrid(); //It should be done here, for the first time.
 		m_evalHitGrid();

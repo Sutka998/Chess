@@ -15,6 +15,7 @@ namespace ch {
 		//If the pawn can be removed by EnPassant, it is true
 		bool m_canBeEnPass;
 	public:
+		const static PieceType pieceType;
 		Pawn(Color, const Position&);
 		void Move_Hit(const Position&);
 	};

@@ -7,7 +7,7 @@ namespace ch {
 		void m_evalHitGrid() {}
 		void m_evalMoveGrid() {}
 	public:
-		Queen(Color col, const Position& pos) : Piece(col, pos) {}
+		Queen(Color col, const Position& pos) : Piece(col, pos, PieceType::QUEEN) {}
 		~Queen(void);
 	};
 

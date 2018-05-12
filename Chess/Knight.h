@@ -7,7 +7,7 @@ namespace ch {
 		void m_evalHitGrid() {}
 		void m_evalMoveGrid() {}
 	public:
-		Knight(Color col, const Position& pos) : Piece(col, pos) {}
+		Knight(Color col, const Position& pos) : Piece(col, pos, PieceType::KNIGHT) {}
 		~Knight(void);
 	};
 
