@@ -6,6 +6,8 @@
 namespace ch {
 	class ChessEngine {
 		Color m_currCol;
+
+		enum side_t{QUEENSIDE, KINGSIDE};
 		//True, when valid, Piece and color check
 		bool m_grabCheck(const Position& src) {  
 			auto piece = m_Board.getPieceAt(src);
@@ -13,6 +15,7 @@ namespace ch {
 		}
 		//Checking for castling, en Passant, or pawn swap
 		bool m_castlingCheck(const Position& src, const Position& dest);
+		bool m_tryCastle(side_t side, Piece* kingCstl);
 		bool m_tryStepExecute(const Position& src, const Position& dest, MovType mvType);
 		bool m_tryKnightStep(const Position& src, const Position& dest);
 		bool m_enPassantCheck(const Position& src, const Position& dest);
@@ -26,7 +29,7 @@ namespace ch {
 		public:
 			enum class iterDIR{UP = 0, DOWN = 1, RIGHT = 2, LEFT=3, UPRIGHT=4, UPLEFT=5, DOWNRIGHT=6, DOWNLEFT=7};
 			lineITER(iterDIR iteratorDirection, const Position& start)
-				: m_iterDirection(iteratorDirection), m_currPos(start)
+				: m_iterDirection(iteratorDirection), m_currPos(start), m_finished(false)
 			{}
 			bool isFinished() const {return m_finished;	}
 			void operator++(int);
@@ -43,20 +46,25 @@ namespace ch {
 			int a;
 			int b;
 		};
+		struct flags{
+			flags() : isCheck(false), isMate(false) {}
+			bool isCheck;
+			bool isMate;
+		};
 
 		bool m_checkStraightDir(const Position& currPos, int& alliedPieces, const King& currKing); //When returns true, the outer loop should be broken.
 		void m_checkKnightDir(const King& currKing);
 		void m_checkEvaluate();
-		bool m_checkForMate();
+		bool m_checkForMate() {return false;}//TODO
+		void m_roundEnd();
 
 		bool m_activeCheck;
+		flags m_flags;
 
-		bool m_blackCastled;
-		bool m_whiteCastled;
-
-		Pawn* m_delEnPassCache; //EnPass able pawn stored here, deleted in the next round
+		Pawn* m_delEnPassCache; //EnPass able pawn stored here, EnPass ability deleted in the next round
 		Board& m_Board;
 	public:
+		const flags& gameFlags;
 		ChessEngine(Board& chessBoard, const King& whiteKing, const King& blackKing);
 		bool ProcessStep(const Position& src, const Position& dst);
 		const Color& getCurrentColor();

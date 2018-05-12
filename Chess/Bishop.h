@@ -9,6 +9,6 @@ namespace ch {
 		void m_evalMoveGrid() {}
 	public:
 		Bishop(Color col, const Position& pos) : Piece(col, pos, PieceType::BISHOP) {}
-		~Bishop(void);
+		~Bishop(void){}
 	};
 }

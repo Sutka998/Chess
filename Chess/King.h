@@ -10,7 +10,7 @@ namespace ch {
 	public:
 		const static PieceType pieceType;
 		King(Color col, const Position& pos) : Piece(col, pos, PieceType::KING){}
-		~King(void);
+		~King(void) {}
 	};
 
 }

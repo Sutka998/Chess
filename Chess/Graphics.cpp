@@ -15,7 +15,7 @@ namespace ch{
 				//The closing line:
 				m_cout<<"   "<<9-i<<'.'<<"\t|___|___|___|___|___|___|___|___|\n";
 			}
-			m_cout<<"\t| A | B | C | D | E | F | G | H |\n"; //last line
+			m_cout<<"\t  A   B   C   D   E   F   G   H  \n"; //last line
 		}
 		else {
 
@@ -32,7 +32,7 @@ namespace ch{
 			switch (piece->pieceType)
 			{
 			case PieceType::PAWN:
-				if(whitePiece) return 'C'; else return 'c';
+				if(whitePiece) return 'P'; else return 'p';
 				break;
 			case PieceType::ROOK:
 				if(whitePiece) return 'R'; else return 'r';

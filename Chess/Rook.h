@@ -8,7 +8,7 @@ namespace ch {
 		void m_evalMoveGrid() {}
 	public:
 		Rook(Color col, const Position& pos) : Piece(col, pos, PieceType::ROOK) {}
-		~Rook(void);
+		~Rook(void){}
 	};
 
 }

@@ -8,7 +8,7 @@ namespace ch {
 		void m_evalMoveGrid() {}
 	public:
 		Queen(Color col, const Position& pos) : Piece(col, pos, PieceType::QUEEN) {}
-		~Queen(void);
+		~Queen(void){}
 	};
 
 }

@@ -100,18 +100,16 @@ namespace ch {
 				if ((m_color == Color::WHITE) && (pos.getRow() == 4)) {
 					m_canBeEnPass = true; //We are moving in the 4th row
 					m_isMoved = true;
-					return; //Move complete
 				}
 				//****Black, and stepping on the 5th row.
 				else if(pos.getRow() == 5) {
 					m_canBeEnPass = true;
 					m_isMoved = true;
-					return; //Move complete
 				}
 			}
 		}
 		//Other cases: When the piece is already moved, or moving/hitting differently:
-		m_canBeEnPass = false; //
-		Piece::Move_Hit(pos);
+		m_canBeEnPass = false; 
+		Piece::Move_Hit(pos); //Finally moving the piece
 	}
 }

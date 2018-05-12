@@ -39,6 +39,7 @@ namespace ch {
 		std::vector<Position> m_moveGrid;
 	public:
 		Piece(Color, const Position&, PieceType);
+		virtual ~Piece(void) {}
 		const PieceType pieceType;
 		bool canMoveHit(const Position&, MovType) const;
 		virtual void Move_Hit(const Position&);

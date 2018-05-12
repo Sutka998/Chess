@@ -12,11 +12,12 @@ namespace ch {
 		//Adding the elements to the **HIT GRID**
 		void m_hitGridAdd_white();
 		void m_hitGridAdd_black();
-		//If the pawn can be removed by EnPassant, it is true
-		bool m_canBeEnPass;
 	public:
+		//If the pawn can be removed by EnPassant, it is true, should be reseted from the outside
+		bool m_canBeEnPass;
 		const static PieceType pieceType;
 		Pawn(Color, const Position&);
-		void Move_Hit(const Position&);
+		virtual void Move_Hit(const Position&);
+		~Pawn(void){}
 	};
 }
