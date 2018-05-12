@@ -1,10 +1,13 @@
 #pragma once
+#include "Piece.h"
 
 namespace ch {
-	class Knight
+	class Knight : public Piece
 	{
+		void m_evalHitGrid() {}
+		void m_evalMoveGrid() {}
 	public:
-		Knight(void);
+		Knight(Color col, const Position& pos) : Piece(col, pos) {}
 		~Knight(void);
 	};
 

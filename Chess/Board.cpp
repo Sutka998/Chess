@@ -48,7 +48,7 @@ namespace ch {
 	void Board::movePiece(const Position& from, const Position& dest) {
 		Piece*& destPtr = m_at(dest);
 		if(destPtr == nullptr) {
-			Piece* fromPtr = m_at(from);
+			Piece*& fromPtr = m_at(from);
 			destPtr = fromPtr;
 			fromPtr = nullptr;
 			return;

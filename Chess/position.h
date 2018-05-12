@@ -18,6 +18,9 @@ namespace ch {
 		{}
 		Column(unsigned short number) : letter(m_letter), number(m_number)
 		{ set(number); }
+		Column(const Column& col) : letter(m_letter), number(m_number) {
+			*this = col;
+		}
 		const CL& letter;
 		const unsigned short& number;
 
@@ -33,7 +36,7 @@ namespace ch {
 	class Position {
 	private:
 		unsigned short m_row;
-		Column m_column;;
+		Column m_column;
 	public:
 		Position (Column c = Column::CL::A, unsigned short row = 2);
 		//Setters

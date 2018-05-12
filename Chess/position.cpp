@@ -39,7 +39,7 @@ namespace ch {
 			return;
 		}
 		throw std::invalid_argument("Column number should be between 1 and 8.");
-	}
+		}
 
 	Column Column::operator-(unsigned short num) const {
 		Column c(*this);

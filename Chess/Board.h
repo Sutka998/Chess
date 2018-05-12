@@ -9,8 +9,8 @@ namespace ch {
 		Piece* m_pieceArray[64];
 		Piece* m_savedArray[64];
 		Piece*& m_at(const Position& pos) {
-			return m_pieceArray[pos.getRow()*8 + pos.getColumn().number];//0th row, 0th column is the beginning
-		}
+			return m_pieceArray[(pos.getRow()-1)*8 + (pos.getColumn().number -1)];//0th row, 0th column is the beginning
+ 		}
 		std::vector<Piece*> m_whitePieces;
 		std::vector<Piece*> m_blackPieces;
 
@@ -54,8 +54,6 @@ namespace ch {
 					case ch::PieceType::KING:
 						posPtr = new King(color, pos);
 						break;
-					default:
-						break;
 					}
 				}
 				catch(...) {
@@ -78,10 +76,10 @@ namespace ch {
 
 		void movePiece(const Position& from, const Position& dest);
 		Piece* getPieceAt(const Position& pos) {
-			return m_pieceArray[pos.getRow()*8 + pos.getColumn().number];
+			return m_pieceArray[(pos.getRow()-1)*8 + (pos.getColumn().number -1)];
 		}
 		const Piece* getPieceAt(const Position& pos) const {
-			return m_pieceArray[pos.getRow()*8 + pos.getColumn().number];
+			return m_pieceArray[(pos.getRow()-1)*8 + (pos.getColumn().number -1)];
 		}
 
 		~Board();
