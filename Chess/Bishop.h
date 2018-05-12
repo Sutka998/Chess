@@ -1,10 +1,14 @@
 #pragma once
+#include "Piece.h"
+
 namespace ch {
 
-	class Bishop
+	class Bishop: public Piece
 	{
+		void m_evalHitGrid() {}
+		void m_evalMoveGrid() {}
 	public:
-		Bishop(void);
+		Bishop(Color col, const Position& pos) : Piece(col, pos) {}
 		~Bishop(void);
 	};
 }
