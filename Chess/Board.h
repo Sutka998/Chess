@@ -30,47 +30,7 @@ namespace ch {
 		void save();
 		void undo();
 
-		void placePieceAt(Color color, const Position& pos, PieceType pieceType) {
-			Piece*& posPtr = m_at(pos);
-			if(posPtr == nullptr) {
-				try {
-					switch (pieceType)
-					{
-					case ch::PieceType::PAWN:
-						posPtr = new Pawn(color, pos);
-						break;
-					case ch::PieceType::BISHOP:
-						posPtr = new Bishop(color, pos);
-						break;
-					case ch::PieceType::KNIGHT:
-						posPtr = new Knight(color, pos);
-						break;
-					case ch::PieceType::ROOK:
-						posPtr = new Rook(color, pos);
-						break;
-					case ch::PieceType::QUEEN:
-						posPtr = new Queen(color, pos);
-						break;
-					case ch::PieceType::KING:
-						posPtr = new King(color, pos);
-						break;
-					}
-				}
-				catch(...) {
-					delete posPtr;
-					posPtr = nullptr;
-					throw;
-				}
-				if (color == Color::BLACK){
-					m_blackPieces.push_back(posPtr);
-				}
-				else{
-					m_whitePieces.push_back(posPtr);
-				}
-				return;
-			}
-			throw std::logic_error("Destination is not nullptr.");
-		}
+		void placePieceAt(Color color, const Position& pos, PieceType pieceType);
 
 		void deletePieceAt(const Position&);
 
