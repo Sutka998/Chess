@@ -41,7 +41,6 @@ namespace ch {
 			bool m_finished;
 			Position m_currPos;
 		};
-
 		struct intPair{
 			int a;
 			int b;
@@ -58,16 +57,20 @@ namespace ch {
 		bool m_checkForMate() {return false;}//TODO
 		void m_roundEnd();
 
+		PieceType (*m_pawnSwapEvent)(void);
+
 		bool m_activeCheck;
 		flags m_flags;
 
 		Pawn* m_delEnPassCache; //EnPass able pawn stored here, EnPass ability deleted in the next round
 		Board& m_Board;
 	public:
+		void setPawnSwapFunction(PieceType (*fnc)(void)){ m_pawnSwapEvent = fnc;}
+
 		const flags& gameFlags;
 		ChessEngine(Board& chessBoard, const King& whiteKing, const King& blackKing);
 		bool ProcessStep(const Position& src, const Position& dst);
-		const Color& getCurrentColor();
+		const Color& getCurrentColor() { return m_currCol;}
 		~ChessEngine(void);
 	};
 

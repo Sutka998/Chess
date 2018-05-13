@@ -99,20 +99,24 @@ namespace ch {
 		}
 		else {
 			m_Board.movePiece(kingFrom, rookTo); //Step one with the king, rookTo field is next to the king
+			kingCstl->Move_Hit(rookTo); //Pre-moving the king, for valid evaluation.
 			m_checkEvaluate(); //The king shouldn't cross "check"
 			if(m_activeCheck) {
+				kingCstl->Move_Hit(kingFrom); //Moving back the king
 				m_Board.undo();
 				return false;
 			}
 			m_Board.movePiece(rookTo, kingTo); //Moving the king to the final position (it was on the rookTo field)
 			m_Board.movePiece(rookFrom, rookTo); //Moving the rook to its position
+			kingCstl->Move_Hit(kingTo); //Pre-moving the king, to its final position.
 			m_checkEvaluate();
 			if(m_activeCheck) { //Check occurred
+				kingCstl->Move_Hit(rookTo);
+				kingCstl->Move_Hit(kingFrom); //Moving back the king to its original position.
 				m_Board.undo();
 				return false;
 			}
-			//Movement was ok, step completed
-			kingCstl->Move_Hit(kingTo);
+			//Movement was ok, step completed, moving the rook to its position
 			rookCstl->Move_Hit(rookTo);
 			return true;
 		}
@@ -147,8 +151,8 @@ namespace ch {
 			//We moved a W pawn from the 7th, or a B pawn from the 2nd row => pawn swap
 			if((m_currCol == Color::WHITE && src.getRow() == 7) || (m_currCol == Color::BLACK && src.getRow() == 2)) {
 				//Valid pawn swap
-				//Event should be triggered //TODO
-				PieceType p = PieceType::QUEEN;
+				//Event should be triggered 
+				PieceType p = m_pawnSwapEvent();
 				m_Board.deletePieceAt(dest); //Remove our pawn
 				m_Board.placePieceAt(m_currCol, dest, p); //Replacing with the asked piece		
 				//Valid step happened
