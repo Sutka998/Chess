@@ -5,7 +5,7 @@ namespace ch {
 	Piece::Piece(Color color, const Position& position, PieceType pcType) 
 		: m_color(color), m_position(position),	m_isMoved(false), pieceType(pcType),
 		m_mGridEvaled(false), m_hGridEvaled(false), m_isCacheValid(false)
-	{}
+	{	}
 
 	bool Piece::canMoveHit(const Position& pos, MovType mvtyp) const {
 		//Is there any cached value
@@ -35,6 +35,17 @@ namespace ch {
 		m_evalHitGrid(); //Moved, refreshing the grids.
 		m_evalMoveGrid();
 		m_isCacheValid = false; //the cached moving position is no longer valid.
+	}
+
+	void Piece::m_hGridEqMvGrid() {
+			if(m_hGridEvaled) {
+				return;
+			}
+			m_hitGrid.clear();
+			m_evalMoveGrid();
+			m_hitGrid = m_moveGrid;
+			m_hGridEvaled = true;
+			return;
 	}
 
 	void Piece::Move_Hit(const Position& pos) {

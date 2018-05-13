@@ -26,6 +26,8 @@ namespace ch {
 		//Have hitGrid, or moveGrid been evaluated since the last step
 		bool m_mGridEvaled;
 		bool m_hGridEvaled;
+		//If the hit grid, and move grid are the same, this method creates the hit grid from the move grid
+		void m_hGridEqMvGrid();
 
 		bool m_isMoved;
 		Position m_position;
