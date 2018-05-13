@@ -4,7 +4,9 @@
 namespace ch {
 	class Knight : public Piece
 	{
-		void m_evalHitGrid();
+		void m_evalHitGrid() {
+			m_hGridEqMvGrid();
+		}
 		void m_evalMoveGrid();
 	public:
 		Knight(Color col, const Position& pos) : Piece(col, pos, PieceType::KNIGHT) {

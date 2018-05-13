@@ -2,17 +2,6 @@
 
 namespace ch {
 
-	void King::m_evalHitGrid() {
-		if(m_hGridEvaled) {
-			return;
-		}
-		m_hitGrid.clear();
-		m_evalMoveGrid();
-		m_hitGrid = m_moveGrid;
-		m_hGridEvaled = true;
-		return;
-	}
-
 	void King::m_evalMoveGrid() {
 		if(m_mGridEvaled) {
 			return;

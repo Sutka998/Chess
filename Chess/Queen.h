@@ -4,10 +4,14 @@ namespace ch {
 
 	class Queen : public Piece
 	{
-		void m_evalHitGrid() {}
-		void m_evalMoveGrid() {}
+		void m_evalHitGrid() {m_hGridEqMvGrid();}
+		void m_evalMoveGrid();
 	public:
-		Queen(Color col, const Position& pos) : Piece(col, pos, PieceType::QUEEN) {}
+		Queen(Color col, const Position& pos) : Piece(col, pos, PieceType::QUEEN) 
+		{
+			m_evalMoveGrid();
+			m_evalHitGrid();
+		}
 		~Queen(void){}
 	};
 

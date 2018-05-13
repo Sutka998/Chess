@@ -5,7 +5,9 @@ namespace ch {
 
 	class King: public Piece
 	{
-		void m_evalHitGrid();
+		void m_evalHitGrid() { //Hit grid and move grid are the same
+			m_hGridEqMvGrid();
+		}
 		void m_evalMoveGrid();
 	public:
 		const static PieceType pieceType;

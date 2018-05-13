@@ -1,16 +1,6 @@
 #include "Knight.h"
 
 namespace ch {
-	void Knight::m_evalHitGrid() {
-		if(m_hGridEvaled) {
-			return;
-		}
-		m_hitGrid.clear();
-		m_evalMoveGrid();
-		m_hitGrid = m_moveGrid;
-		m_hGridEvaled = true;
-		return;
-	}
 
 	void Knight::m_evalMoveGrid() {
 		if(m_mGridEvaled) {
