@@ -13,44 +13,7 @@
 #include "Graphics.h"
 #include <sstream>
 
-namespace ch{
-	template <class _FPtr>
-	class Event{
-		std::list<_FPtr> m_toCall;
 
-	public:
-		Event() {}
-		template<class _PrA>
-		void operator()(_PrA prA){
-			for (auto it = m_toCall.begin(); it!=m_toCall.end(); it++){
-				(*it)(prA);
-			}
-		}
-		template<class _PrA, class _PrB>
-		void operator()(_PrA prA, _PrB prB);
-		template<class _PrA, class _PrB, class _PrC>
-		void operator()(_PrA prA, _PrB prB, _PrC prC);
-
-		bool isValid() {
-			return !m_toCall.empty();
-		}
-		bool operator!() {
-			return isValid();
-		}
-		void operator+=(_FPtr fvP){
-			m_toCall.push_back(fvP);
-		}
-		void operator-=(_FPtr fvP) {
-			for (auto it = m_toCall.begin(); it!= m_toCall.end(); it++) {
-				if(*it == fvP) {
-					m_toCall.erase(it);
-					return;
-				}
-			}
-		}
-
-	};
-}
 void abc(int a) {
 	std::cout<<"Az int: "<< a<<std::endl;
 }
@@ -59,26 +22,48 @@ int*& test(int** arr){
 	return arr[2];
 
 }
+ch::PieceType xyz() {
+	std::cout<<"Pawn swap, piece? \n";
+	char c;
+	std::cin >> c;
+	switch (c)
+	{
+	case 'r':
+		return ch::PieceType::ROOK;
+	case 'n':
+		return ch::PieceType::KNIGHT;
+	case 'b':
+		return ch::PieceType::BISHOP;
+	default:
+		return ch::PieceType::QUEEN;
+	}
+}
 
-using namespace ch;
-int main(){	
-	/*ch::Event<void(*)(int)> e;
-	e+=abc;
-	int x = 12;
-	e(12);*/
+std::ostream& operator<<(std::ostream& os, ch::Color col) {
+	if(col == ch::Color::WHITE) {
+		os << "WHITE";
+	} else{
+		os<<"BLACK";
+	}
+	return os;
+}
+
+void testChess() {
+	using namespace ch;
 	Graphics graph(std::cout);
 	Board brd;
 	graph.setBoard(&brd);
-	/*for (int i = 0; i < 8; i++) {
+/*	for (int i = 0; i < 8; i++) {
 		brd.placePieceAt(Color::WHITE, Position(Column(i+1), 2), PieceType::PAWN);
 		brd.placePieceAt(Color::BLACK, Position(Column(i+1), 7), PieceType::PAWN);
 	}*/
-	brd.placePieceAt(Color::BLACK, Position(Column::CL::F, 2), PieceType::PAWN);
-	brd.placePieceAt(Color::WHITE, Position(Column::CL::G, 2), PieceType::PAWN);
+	brd.placePieceAt(Color::BLACK, Position(Column::CL::B, 4), PieceType::PAWN);//F7 k, G5 P
+	brd.placePieceAt(Color::WHITE, Position(Column::CL::A, 1), PieceType::QUEEN);
 	brd.placePieceAt(Color::WHITE, Position(Column::CL::E, 1), PieceType::KING);
 	brd.placePieceAt(Color::BLACK, Position(Column::CL::E, 8), PieceType::KING);
 	graph.renderImg();
 	ChessEngine che(brd, *(King*)brd.getPieceAt(Position(Column::CL::E, 1)), *(King*)brd.getPieceAt(Position(Column::CL::E, 8)));
+	che.setPawnSwapFunction(xyz);
 	while (1) {
 		std::string in;
 		getline(std::cin, in);
@@ -87,8 +72,18 @@ int main(){
 		ss>>fr1>>fr2>>de1>>de2;
 		if(che.ProcessStep(Position(fr1, fr2), Position(de1, de2))){
 			graph.renderImg();
-			std::cout<<"Processed\n";
+			std::cout<<"Processed, next is: "<<che.getCurrentColor()<<"\n";
 		}
 	}
+}
+
+
+int main(){	
+	/*ch::Event<void(*)(int)> e;
+	e+=abc;
+	int x = 12;
+	e(12);*/
+	testChess();
+
 	return 0;
 }
