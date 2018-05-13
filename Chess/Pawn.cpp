@@ -44,29 +44,34 @@ namespace ch {
 	void Pawn::m_moveGridAdd_white() {
 		//For white pawns, adding positions to the move grid.
 		//Isn't moved: pawn stays in the second row, can move on the 3rd, or on the 4th row
-		if(!m_isMoved) {
+		if(m_position.getRow() == 2) { //Modified: !m_isMoved is not good, what if the user places the pawn somewhere else (when generating)
 			m_moveGrid.push_back(Position(m_position.getColumn(), 3)); //3rd
 			m_moveGrid.push_back(Position(m_position.getColumn(), 4)); //4th
-		} //If it is moved. Can't stay in the 8th row, because it would be swapped.
-		else {
+		}
+		else if(m_position.getRow() != 8) {
 			//It can step on the next row only.
 			m_moveGrid.push_back(Position(m_position.getColumn(), m_position.getRow()+1));
 		}
+		//In the 8th row we can't move, we are "waiting" for the pawn swap
 	}
 	void Pawn::m_moveGridAdd_black(){
 		//For the black pawn, adding the positions to the move grid.
-		if(!m_isMoved) {
+		if(m_position.getRow() == 7) {
 			m_moveGrid.push_back(Position(m_position.getColumn(), 6)); //3rd from the 8th
 			m_moveGrid.push_back(Position(m_position.getColumn(), 5)); //4th from the 8th
-		} //If it is moved. Can't stay in the 1st row, because it would be swapped.
-		else{
+		} 
+		else if(m_position.getRow() != 1){ 
 			//It can step on the next row only. Decrementing step, from the start row.
 			m_moveGrid.push_back(Position(m_position.getColumn(), m_position.getRow()-1));
 		}
+		//In the 1st row, it can no longer move.
 	}
 
 	void Pawn::m_hitGridAdd_white() {
 		const Column& c = m_position.getColumn();
+		if(m_position.getRow() == 8) { //In the last row we can do nothing.
+			return;
+		}
 		if(c == Column::CL::A) {//Left column
 			m_hitGrid.push_back(Position(Column::CL::B, m_position.getRow()+1));
 		}
@@ -80,6 +85,9 @@ namespace ch {
 	}
 	void Pawn::m_hitGridAdd_black() {
 		const Column& c = m_position.getColumn();
+		if(m_position.getRow()==1) {//In the last row we can do nothing
+			return;
+		}
 		if(c == Column::CL::A) {//Left column
 			m_hitGrid.push_back(Position(Column::CL::B, m_position.getRow()-1));
 		}
@@ -93,7 +101,7 @@ namespace ch {
 	}
 
 	void Pawn::Move_Hit(const Position& pos) {
-		
+
 		if(canMoveHit(pos, MovType::MOVE)){
 			if(!m_isMoved) { //If not moved, and steps 2 ahead, it is able to hit by En Passant
 				//****White, and stepping on the 4th row.
