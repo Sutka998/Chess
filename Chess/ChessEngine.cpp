@@ -126,11 +126,17 @@ namespace ch {
 			m_Board.deletePieceAt(dest);
 			m_Board.movePiece(src, dest);
 		}
+		if(srcPiece->pieceType == PieceType::KING) {
+			srcPiece->Move_Hit(dest); //We have to pre-remove the king, for correct check evaluation, if we are moving king.
+		}
 		m_checkEvaluate(); //The step was completed on the board, checking for check
 		if(m_activeCheck) {
+			if (srcPiece->pieceType == PieceType::KING) {
+				srcPiece->Move_Hit(src); //Moving back our piece
+			}
 			m_Board.undo(); 
 			return false; //Invalid step
-		} else {
+		} else if(srcPiece->pieceType != PieceType::KING){ //If we have king, the move is already completed.
 			srcPiece->Move_Hit(dest); //Completing the move/hit by moving the piece to the destination
 		}
 		//Move completed, pawn swap check, or EnPassant ability check
@@ -239,7 +245,8 @@ namespace ch {
 
 	void ChessEngine::m_checkEvaluate() {
 		m_activeCheck = false;
-		const King& currKing = (m_currCol == Color::WHITE) ? m_whiteKing : m_blackKing;
+		const King& currKing = (m_currCol == Color::WHITE)? m_whiteKing : m_blackKing;
+
 		m_checkKnightDir(currKing);
 		if(m_activeCheck == true) {
 			return; //There is check found, we can return
@@ -247,7 +254,7 @@ namespace ch {
 		int alliedPieces = 0;
 
 		for (int i = 0; i < 8; i++) {
-			auto iter = lineITER(static_cast<lineITER::iterDIR>(i), currKing.getPosition());
+			auto iter = lineITER(static_cast<lineITER::iterDIR>(i), currKing.getPosition());//We need the position dependent on the board
 			iter++;
 			for(; !iter.isFinished(); iter++) {
 				if(m_checkStraightDir((*iter), alliedPieces, currKing) == true) {
