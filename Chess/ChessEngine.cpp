@@ -197,6 +197,46 @@ namespace ch {
 	}
 
 	bool ChessEngine::m_isWayFree(const Position& src, const Position& dest) {
+		lineITER::iterDIR itDir;
+		if(src.getRow() == dest.getRow()) { //Same row
+			if (src.getColumn().number > dest.getColumn().number) { //Dest is to the right side
+				itDir = lineITER::iterDIR::LEFT;
+			} else {
+				itDir = lineITER::iterDIR::RIGHT;
+			}
+		}
+		else if(src.getColumn() == dest.getColumn()) { //Same column
+			if (src.getRow() > dest.getRow()) { //Dest is under the src
+				itDir = lineITER::iterDIR::DOWN;
+			} else {
+				itDir = lineITER::iterDIR::UP;
+			}
+		}
+		else if(dest.getRow() == (dest.getColumn().number - src.getColumn().number + src.getRow())) { //y = x - c + r line
+			if (src.getColumn().number > dest.getColumn().number) { //Destination is to the left and under to the source = DOWNLEFT
+				itDir = lineITER::iterDIR::DOWNLEFT;
+			} else {
+				itDir = lineITER::iterDIR::UPRIGHT;
+			}
+		}
+		else if(dest.getRow() == (-dest.getColumn().number + src.getColumn().number + src.getRow())) { //y = -x + c + r line 
+			if (src.getColumn().number > dest.getColumn().number) { //Destination is to the left and over to the source = DOWNLEFT
+				itDir = lineITER::iterDIR::UPLEFT;
+			} else {
+				itDir = lineITER::iterDIR::DOWNRIGHT;
+			}
+		}
+		else {
+			throw std::logic_error("The src and dest are not on a line");
+		}
+		lineITER iter (itDir, src);
+		iter++; //Iter is initialized on the src, we don't wanna check the src
+		for (; !(iter.getCurrentPosition() == dest); iter++) { //NOT equals with the destination
+			if(m_Board.getPieceAt((*iter)) == nullptr) {
+				continue;
+			}
+			return false; //We found a piece, not nullptr
+		}
 		return true;
 	}
 
@@ -302,13 +342,13 @@ namespace ch {
 				m_currPos = Position(m_currPos.getColumn().number -1, m_currPos.getRow());
 				break;
 			case iterDIR::UPRIGHT:
-				m_currPos = Position(m_currPos.getColumn().number +1, m_currPos.getRow() +1);
+				m_currPos = Position(m_currPos.getColumn().number +1, m_currPos.getRow() +1); 
 				break;
 			case iterDIR::UPLEFT:
-				m_currPos = Position(m_currPos.getColumn().number +1, m_currPos.getRow() -1);
+				m_currPos = Position(m_currPos.getColumn().number -1, m_currPos.getRow() +1); 
 				break;
 			case iterDIR::DOWNRIGHT:
-				m_currPos = Position(m_currPos.getColumn().number -1, m_currPos.getRow() +1);
+				m_currPos = Position(m_currPos.getColumn().number +1, m_currPos.getRow() -1);
 				break;
 			case iterDIR::DOWNLEFT:
 				m_currPos = Position(m_currPos.getColumn().number -1, m_currPos.getRow() -1);
