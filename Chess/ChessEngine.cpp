@@ -3,7 +3,7 @@
 
 namespace ch {
 
-	ChessEngine::ChessEngine(Board& chessBoard, const King& whiteKing, const King& blackKing)
+	ChessEngine::ChessEngine(Board& chessBoard, const King* whiteKing, const King* blackKing)
 		: m_Board(chessBoard), m_whiteKing(whiteKing), m_blackKing(blackKing), gameFlags(m_flags)
 	{
 		m_currCol = Color::WHITE;
@@ -11,6 +11,7 @@ namespace ch {
 	}
 
 	bool ChessEngine::ProcessStep(const Position& src, const Position& dst) {
+		if(m_whiteKing == nullptr || m_blackKing == nullptr) { throw std::invalid_argument("The kings can not be nullPtr");}
 		Piece* srcPiece = m_Board.getPieceAt(src);
 		Piece* dstPiece= m_Board.getPieceAt(dst);
 		bool validHappened = false;
@@ -21,6 +22,7 @@ namespace ch {
 			return false; //wrong color
 		}
 		if(m_castlingCheck(src, dst) == true) {
+			m_roundEnd();
 			return true; //Spec. step processed
 		}
 		if(srcPiece->pieceType == PieceType::KNIGHT) {
@@ -29,9 +31,8 @@ namespace ch {
 			}
 			validHappened = true; //Knight step executed
 		}
-		else if(m_isWayFree(src, dst)) {
-			if(dstPiece == nullptr) { //Moving, dest is empty
-				if(srcPiece->canMoveHit(dst, MovType::MOVE)) {
+		else if(dstPiece == nullptr) { //Moving, dest is empty
+				if(srcPiece->canMoveHit(dst, MovType::MOVE) && m_isWayFree(src, dst)) { //Can move there, and the way is free
 					if (m_tryStepExecute(src, dst, MovType::MOVE) == false) { //Destination is nullptr
 						return false; //Invalid step
 					}
@@ -40,14 +41,13 @@ namespace ch {
 			}
 			else if((dstPiece->getColor() != m_currCol) && (dstPiece->pieceType !=  PieceType::KING))  {
 				//Destination is enemy, and not the king
-				if(srcPiece->canMoveHit(dst, MovType::HIT)) { //Our piece is able to hit the enemy 
+				if(srcPiece->canMoveHit(dst, MovType::HIT) && m_isWayFree(src, dst)) { //Our piece is able to hit the enemy, and the way is free
 					if(m_tryStepExecute(src, dst, MovType::HIT) == false) {
 						return false; 
 					}
 					validHappened = true; //Hit step executed
 				}
 			}
-		}
 		if (validHappened) { //When valid step happened, we have to save,
 			m_roundEnd();
 			return true;
@@ -130,6 +130,7 @@ namespace ch {
 			m_Board.deletePieceAt(dest);
 			m_Board.movePiece(src, dest);
 		}
+		//TODO 
 		if(srcPiece->pieceType == PieceType::KING) {
 			srcPiece->Move_Hit(dest); //We have to pre-remove the king, for correct check evaluation, if we are moving king.
 		}
@@ -289,7 +290,7 @@ namespace ch {
 
 	void ChessEngine::m_checkEvaluate() {
 		m_activeCheck = false;
-		const King& currKing = (m_currCol == Color::WHITE)? m_whiteKing : m_blackKing;
+		const King& currKing = (m_currCol == Color::WHITE)? (*m_whiteKing) : (*m_blackKing);
 
 		m_checkKnightDir(currKing);
 		if(m_activeCheck == true) {

@@ -3,6 +3,7 @@
 #include "Pawn.h"
 #include "Board.h"
 #include "King.h"
+
 namespace ch {
 	class ChessEngine {
 		Color m_currCol;
@@ -22,8 +23,8 @@ namespace ch {
 		//Checks whether the way is free to the dest. Does not include destination.
 		bool m_isWayFree(const Position& src, const Position& dest);
 
-		const King& m_whiteKing;
-		const King& m_blackKing;
+		const King* m_whiteKing;
+		const King* m_blackKing;
 
 		class lineITER {
 		public:
@@ -66,11 +67,14 @@ namespace ch {
 		Board& m_Board;
 	public:
 		void setPawnSwapFunction(PieceType (*fnc)(void)){ m_pawnSwapEvent = fnc;}
-
 		const flags& gameFlags;
-		ChessEngine(Board& chessBoard, const King& whiteKing, const King& blackKing);
+		ChessEngine(Board& chessBoard, const King* whiteKing = nullptr, const King* blackKing = nullptr);
+		void setKing(const King* whiteKing, const King* blackKing){
+			m_whiteKing = whiteKing;
+			m_blackKing = blackKing;
+		}
 		bool ProcessStep(const Position& src, const Position& dst);
-		const Color& getCurrentColor() { return m_currCol;}
+		const Color& getCurrentColor() const { return m_currCol;}
 		~ChessEngine(void);
 	};
 
