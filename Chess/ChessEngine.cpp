@@ -7,6 +7,7 @@ namespace ch {
 		: m_Board(chessBoard), m_whiteKing(whiteKing), m_blackKing(blackKing), gameFlags(m_flags)
 	{
 		m_currCol = Color::WHITE;
+		m_setCurrKingPos();
 		m_Board.save();
 	}
 
@@ -32,22 +33,22 @@ namespace ch {
 			validHappened = true; //Knight step executed
 		}
 		else if(dstPiece == nullptr) { //Moving, dest is empty
-				if(srcPiece->canMoveHit(dst, MovType::MOVE) && m_isWayFree(src, dst)) { //Can move there, and the way is free
-					if (m_tryStepExecute(src, dst, MovType::MOVE) == false) { //Destination is nullptr
-						return false; //Invalid step
-					}
-					validHappened = true; //We have executed the move step
+			if(srcPiece->canMoveHit(dst, MovType::MOVE) && m_isWayFree(src, dst)) { //Can move there, and the way is free
+				if (m_tryStepExecute(src, dst, MovType::MOVE) == false) { //Destination is nullptr
+					return false; //Invalid step
 				}
+				validHappened = true; //We have executed the move step
 			}
-			else if((dstPiece->getColor() != m_currCol) && (dstPiece->pieceType !=  PieceType::KING))  {
-				//Destination is enemy, and not the king
-				if(srcPiece->canMoveHit(dst, MovType::HIT) && m_isWayFree(src, dst)) { //Our piece is able to hit the enemy, and the way is free
-					if(m_tryStepExecute(src, dst, MovType::HIT) == false) {
-						return false; 
-					}
-					validHappened = true; //Hit step executed
+		}
+		else if((dstPiece->getColor() != m_currCol) && (dstPiece->pieceType !=  PieceType::KING))  {
+			//Destination is enemy, and not the king
+			if(srcPiece->canMoveHit(dst, MovType::HIT) && m_isWayFree(src, dst)) { //Our piece is able to hit the enemy, and the way is free
+				if(m_tryStepExecute(src, dst, MovType::HIT) == false) {
+					return false; 
 				}
+				validHappened = true; //Hit step executed
 			}
+		}
 		if (validHappened) { //When valid step happened, we have to save,
 			m_roundEnd();
 			return true;
@@ -97,10 +98,9 @@ namespace ch {
 		if(rookCstl == nullptr || rookCstl->isMoved() || rookCstl->pieceType != PieceType::ROOK) {
 			return false; //No piece, or rook is moved, or the rookCstl is not rook						
 		}
-		else {
+		else {//We have to call checkEvaulate with positions, where are we stepping, because we are moving the king.
 			m_Board.movePiece(kingFrom, rookTo); //Step one with the king, rookTo field is next to the king
-			kingCstl->Move_Hit(rookTo); //Pre-moving the king, for valid evaluation.
-			m_checkEvaluate(); //The king shouldn't cross "check"
+			m_checkEvaluate(rookTo); //The king shouldn't cross "check"
 			if(m_activeCheck) {
 				kingCstl->Move_Hit(kingFrom); //Moving back the king
 				m_Board.undo();
@@ -108,8 +108,7 @@ namespace ch {
 			}
 			m_Board.movePiece(rookTo, kingTo); //Moving the king to the final position (it was on the rookTo field)
 			m_Board.movePiece(rookFrom, rookTo); //Moving the rook to its position
-			kingCstl->Move_Hit(kingTo); //Pre-moving the king, to its final position.
-			m_checkEvaluate();
+			m_checkEvaluate(kingTo);
 			if(m_activeCheck) { //Check occurred
 				kingCstl->Move_Hit(rookTo);
 				kingCstl->Move_Hit(kingFrom); //Moving back the king to its original position.
@@ -124,24 +123,23 @@ namespace ch {
 
 	bool ChessEngine::m_tryStepExecute(const Position& src, const Position& dest, MovType mvType) {
 		Piece* srcPiece = m_Board.getPieceAt(src);
+
 		if(mvType == MovType::MOVE) {
 			m_Board.movePiece(src, dest);
 		} else {
 			m_Board.deletePieceAt(dest);
 			m_Board.movePiece(src, dest);
-		}
-		//TODO 
+		} 
 		if(srcPiece->pieceType == PieceType::KING) {
-			srcPiece->Move_Hit(dest); //We have to pre-remove the king, for correct check evaluation, if we are moving king.
+			m_checkEvaluate(dest);
+		} else {
+			m_checkEvaluate(*m_currKingPos);
 		}
-		m_checkEvaluate(); //The step was completed on the board, checking for check
+		//The step was completed on the board, checking for check
 		if(m_activeCheck) {
-			if (srcPiece->pieceType == PieceType::KING) {
-				srcPiece->Move_Hit(src); //Moving back our piece
-			}
 			m_Board.undo(); 
 			return false; //Invalid step
-		} else if(srcPiece->pieceType != PieceType::KING){ //If we have king, the move is already completed.
+		} else {
 			srcPiece->Move_Hit(dest); //Completing the move/hit by moving the piece to the destination
 		}
 		//Move completed, pawn swap check, or EnPassant ability check
@@ -179,7 +177,7 @@ namespace ch {
 			else {
 				return false; //Invalid step, trying to hit allied piece, or a king
 			}
-			m_checkEvaluate();
+			m_checkEvaluate(*m_currKingPos);
 			if(m_activeCheck) {//Gets check after move, invalid step
 				m_Board.undo();
 				return false;
@@ -189,7 +187,7 @@ namespace ch {
 		}
 		else { return false;} //Not in the hit/move grid, invalid step.
 		//Check check
-		m_checkEvaluate();
+		m_checkEvaluate(*m_currKingPos);
 		if(m_activeCheck) {
 			m_Board.undo();
 			return false; //We got check, we can not step this way, and we have to undo.
@@ -241,7 +239,7 @@ namespace ch {
 		return true;
 	}
 
-	bool ChessEngine::m_checkStraightDir(const Position& currPos, int& alliedPieces, const King& currKing) {
+	bool ChessEngine::m_checkStraightDir(const Position& currPos, int& alliedPieces, const Position& kingPos) {
 		Piece* currPiece = m_Board.getPieceAt(currPos);
 		if((currPiece != nullptr)) {
 			if(currPiece->getColor() == m_currCol) { //Allied piece
@@ -252,7 +250,7 @@ namespace ch {
 				return true; //No check from this direction, enemy piece was found, loop should be broken.
 			}
 			else { //No allied piece was between, the king can be in check
-				if (m_Board.getPieceAt(currPos)->canMoveHit(currKing.getPosition(), MovType::HIT)) { //If the enemy piece can hit our king
+				if (m_Board.getPieceAt(currPos)->canMoveHit(kingPos, MovType::HIT)) { //If the enemy piece can hit our king
 					//It is check then
 					m_activeCheck = true;		 
 				}
@@ -262,11 +260,10 @@ namespace ch {
 		return false; //Nothing was found, continuing the loop
 	}
 
-	void ChessEngine::m_checkKnightDir(const King& currKing) {
+	void ChessEngine::m_checkKnightDir(const Position& kingPos) {
 		//8 different directions to check
 		intPair argArray[8] = {{1,2}, {-1, 2}, {2, 1}, {2, -1}, {1,-2}, {-1, -2}, {-2, 1}, {-2, -1}};
 		// North right-left ; east up-down ; south right-left ; west up-down
-		const Position& kingPos = currKing.getPosition();
 		for (int i = 0; i < 8; i++) {
 			int cl = kingPos.getColumn().number; //Kings column
 			int rw = kingPos.getRow(); //Kings row
@@ -288,21 +285,20 @@ namespace ch {
 		}
 	}
 
-	void ChessEngine::m_checkEvaluate() {
+	void ChessEngine::m_checkEvaluate(const Position& kingPos) {
 		m_activeCheck = false;
-		const King& currKing = (m_currCol == Color::WHITE)? (*m_whiteKing) : (*m_blackKing);
 
-		m_checkKnightDir(currKing);
+		m_checkKnightDir(kingPos);
 		if(m_activeCheck == true) {
 			return; //There is check found, we can return
 		}
 		int alliedPieces = 0;
 
 		for (int i = 0; i < 8; i++) {
-			auto iter = lineITER(static_cast<lineITER::iterDIR>(i), currKing.getPosition());//We need the position dependent on the board
+			auto iter = lineITER(static_cast<lineITER::iterDIR>(i), kingPos);//We need the position dependent on the board
 			iter++;
 			for(; !iter.isFinished(); iter++) {
-				if(m_checkStraightDir((*iter), alliedPieces, currKing) == true) {
+				if(m_checkStraightDir((*iter), alliedPieces, kingPos) == true) {
 					break;
 				}
 			}
@@ -314,8 +310,10 @@ namespace ch {
 	}
 
 	void ChessEngine::m_roundEnd() {
+
 		m_currCol = (m_currCol == Color::WHITE) ? Color::BLACK : Color::WHITE; //Enemy's next turn, swapping player
-		m_checkEvaluate(); //Evaluate check and mate situations for the enemy
+		m_setCurrKingPos();
+		m_checkEvaluate(*m_currKingPos); //Evaluate check and mate situations for the enemy
 		//Setting up the flags
 		m_flags.isMate = m_checkForMate();
 		m_flags.isCheck = m_activeCheck;

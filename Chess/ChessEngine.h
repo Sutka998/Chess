@@ -26,6 +26,14 @@ namespace ch {
 		const King* m_whiteKing;
 		const King* m_blackKing;
 
+		const Position* m_currKingPos;
+		void m_setCurrKingPos() {
+			if(m_whiteKing != nullptr && m_blackKing != nullptr) {
+				m_currKingPos = (m_currCol == Color::WHITE) ?
+				&(m_whiteKing->getPosition()) : &(m_blackKing->getPosition());
+			}
+		}
+
 		class lineITER {
 		public:
 			enum class iterDIR{UP = 0, DOWN = 1, RIGHT = 2, LEFT=3, UPRIGHT=4, UPLEFT=5, DOWNRIGHT=6, DOWNLEFT=7};
@@ -52,9 +60,9 @@ namespace ch {
 			bool isMate;
 		};
 
-		bool m_checkStraightDir(const Position& currPos, int& alliedPieces, const King& currKing); //When returns true, the outer loop should be broken.
-		void m_checkKnightDir(const King& currKing);
-		void m_checkEvaluate();
+		bool m_checkStraightDir(const Position& currPos, int& alliedPieces, const Position& kingPos); //When returns true, the outer loop should be broken.
+		void m_checkKnightDir(const Position& kingPos);
+		void m_checkEvaluate(const Position& kingPos);
 		bool m_checkForMate() {return false;}//TODO
 		void m_roundEnd();
 
@@ -72,6 +80,7 @@ namespace ch {
 		void setKing(const King* whiteKing, const King* blackKing){
 			m_whiteKing = whiteKing;
 			m_blackKing = blackKing;
+			m_setCurrKingPos();
 		}
 		bool ProcessStep(const Position& src, const Position& dst);
 		const Color& getCurrentColor() const { return m_currCol;}
