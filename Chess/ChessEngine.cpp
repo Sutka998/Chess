@@ -238,7 +238,7 @@ namespace ch {
 		}
 		return true;
 	}
-
+	//It is connected with the check calculation
 	bool ChessEngine::m_checkStraightDir(const Position& currPos, int& alliedPieces, const Position& kingPos) {
 		Piece* currPiece = m_Board.getPieceAt(currPos);
 		if((currPiece != nullptr)) {
@@ -259,7 +259,7 @@ namespace ch {
 		}
 		return false; //Nothing was found, continuing the loop
 	}
-
+	//For check check, checks for the knight directions
 	void ChessEngine::m_checkKnightDir(const Position& kingPos) {
 		//8 different directions to check
 		intPair argArray[8] = {{1,2}, {-1, 2}, {2, 1}, {2, -1}, {1,-2}, {-1, -2}, {-2, 1}, {-2, -1}};
@@ -292,9 +292,9 @@ namespace ch {
 		if(m_activeCheck == true) {
 			return; //There is check found, we can return
 		}
-		int alliedPieces = 0;
 
 		for (int i = 0; i < 8; i++) {
+			int alliedPieces = 0;
 			auto iter = lineITER(static_cast<lineITER::iterDIR>(i), kingPos);//We need the position dependent on the board
 			iter++;
 			for(; !iter.isFinished(); iter++) {
@@ -305,19 +305,89 @@ namespace ch {
 			if(m_activeCheck) { //If check found, we can return
 				return;
 			}
-			alliedPieces = 0;
 		}
+	}
+
+	bool ChessEngine::m_checkForMate() {
+		std::vector<Position> checkLine;
+		m_activeCheck = false;
+		//CAN the king step? check#1
+		m_canKingAvoidCheck();
+
+		if(m_flags.isCheck) { //If we are in check, we have to evaluate the check line.
+			for (int i = 0; i < 8; i++) {//8 directions
+				int alliedPieces = 0;
+				checkLine.clear();//Delete
+				auto iter = lineITER(static_cast<lineITER::iterDIR>(i), *m_currKingPos);//We need the position dependent on the board
+				iter++;
+				for(; !iter.isFinished(); iter++) {
+					checkLine.push_back(*iter);//Adding the fields, on we are going
+					if(m_checkStraightDir((*iter), alliedPieces, *m_currKingPos) == true) {
+						break; //Found enemy piece
+					}
+				}
+				if(m_activeCheck) { //We find the check line, if we didn't, the check comes from knight
+					break;
+				}
+			}
+			if(m_activeCheck) {//We broke the loop
+				//Going trough the white pieces
+				for (auto piter = m_Board.it_Begin(m_currCol);
+					piter != m_Board.it_End(m_currCol); piter++ ) {
+						//Not king, can it block the check? 
+						if((*piter)->pieceType != PieceType::KING) {
+							//If we can step, it is not mate
+							if (!m_isIntSectEmpty<Position>((*piter)->getMoveGrid(), checkLine.begin(), checkLine.end())) {
+								return;
+							}
+						}
+				}
+				//Neither of the pieces could block the mate. The king can't avoid (we checked it earlier), so its mate (checkmate)
+				m_flags.isMate = true;
+			} 
+			else{//We can step away with the king only, but we checked it earlier
+				m_flags.isMate = true;
+				return; //Checkmate
+			}
+		}
+		else { //We were not in check-> can any piece move? Can the pieces which are blocking check move on the check line?
+			if(m_canKingAvoidCheck()) { //Means the king can step, without getting check
+				return;
+			}
+		}
+
+	}
+	//For mate check
+	bool ChessEngine::m_canKingAvoidCheck(){
+		const Piece& currKing = *((m_currCol == Color::WHITE)? m_whiteKing : m_blackKing);
+
+		const std::vector<Position>& moveGrid = currKing.getMoveGrid();
+
+		m_Board.deletePieceAt(currKing.getPosition()); //remove the king, temporally
+		for (auto iter = moveGrid.begin(); iter != moveGrid.end(); iter++) {
+			if(m_Board.getPieceAt(*iter)->getColor() == m_currCol) { //Allied piece
+				continue;
+			}
+			m_checkEvaluate(currKing.getPosition()); //Check for check;
+			if(m_activeCheck == false) {
+				m_Board.undo();
+				return true; //yes, king can avoid check in that position
+			}
+		}
+		//We did not found any position, where it can avoid check => can't avoid
+		m_Board.undo();
+		return false;
 	}
 
 	void ChessEngine::m_roundEnd() {
 
 		m_currCol = (m_currCol == Color::WHITE) ? Color::BLACK : Color::WHITE; //Enemy's next turn, swapping player
 		m_setCurrKingPos();
+		m_Board.save(); //Saving the board for the next turn
 		m_checkEvaluate(*m_currKingPos); //Evaluate check and mate situations for the enemy
 		//Setting up the flags
-		m_flags.isMate = m_checkForMate();
 		m_flags.isCheck = m_activeCheck;
-		m_Board.save(); //Saving the board for the next turn
+		m_flags.isMate = m_checkForMate();
 	}
 
 	ChessEngine::~ChessEngine(void)
