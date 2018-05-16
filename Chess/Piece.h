@@ -1,6 +1,9 @@
 #pragma once
 #include "position.h"
+#include "Iserializable.h"
 #include <vector>
+#include <fstream>
+#include <string>
 
 namespace ch {
 	enum class Color {
@@ -13,7 +16,31 @@ namespace ch {
 		MOVE, HIT
 	};
 
-	class Piece {
+	inline std::ofstream& operator<<(std::ofstream& os, Color c) {
+		if(c == Color::WHITE) 
+			os<<"WHITE";
+		else
+			os<<"BLACK";
+		return os;
+	}
+	inline std::ifstream& operator>>(std::ifstream& is, Color& c) {
+		std::string a;
+		is>>a;
+		if(a == "WHITE") {
+			c = Color::WHITE;
+		}
+		else if(a =="BLACK") {
+			c = Color::BLACK;
+		}
+		else {
+			is.setstate(std::ios::failbit);
+		}
+		return is;
+	}
+	std::ofstream& operator<<(std::ofstream& os, PieceType pc);
+	std::ifstream& operator>>(std::ifstream& is, PieceType& pc);
+
+	class Piece : public ISerializable{
 	private:
 		//Depends on the type of piece
 		virtual void m_evalHitGrid() = 0;
@@ -45,6 +72,10 @@ namespace ch {
 		const PieceType pieceType;
 		bool canMoveHit(const Position&, MovType) const;
 		virtual void Move_Hit(const Position&);
+
+		//Interface
+		virtual void Serialize(std::ofstream&) const;
+		virtual void Deserialize(std::ifstream&);
 
 		//Getters
 		const std::vector<Position>& getHitGrid() const {return m_hitGrid;}
