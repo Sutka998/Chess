@@ -8,6 +8,21 @@ namespace ch {
 		m_evalHitGrid();
 	}
 
+	void Pawn::Serialize(std::ofstream& os) const {
+		os<<m_canBeEnPass<<", ";
+		Piece::Serialize(os);
+	}
+
+	void Pawn::Deserialize(std::ifstream& is) {
+		char c;
+		is>>m_canBeEnPass>>c;
+		if(is.good() && c ==',') {
+			Piece::Deserialize(is);
+			return;
+		}
+		throw std::exception("File format error");
+	}
+
 	const PieceType Pawn::pieceType = PieceType::PAWN;
 
 	void Pawn::m_evalMoveGrid() {

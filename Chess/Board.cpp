@@ -30,6 +30,82 @@ namespace ch {
 		}
 	}
 
+	void Board::Serialize(std::ofstream& os) const {
+		os<<"BOARD: ";
+		for (int i = 0; i<64; i++) {
+			if(m_pieceArray[i] == nullptr) {
+				os<<"NOPE, ";
+			} else {
+				os<<"PIECE ";
+				os<<m_pieceArray[i]->getColor() <<" ";
+				os<<m_pieceArray[i]->pieceType<<" , ";
+				m_pieceArray[i]->Serialize(os);
+			}
+		}
+		for (int i = 0; i<64; i++) {
+			if(m_savedArray[i] == nullptr) {
+				os<<"NOPE, ";
+			} else {
+				os<<"PIECE ";
+				os<<m_savedArray[i]->getColor() <<" ";
+				os<<m_savedArray[i]->pieceType<<" , ";
+				m_pieceArray[i]->Serialize(os);
+			}
+		}
+	}
+
+	void Board::Deserialize(std::ifstream& is) {
+		std::string buff; Color col; PieceType pcTyp;
+		is>>buff;
+		if(buff == "BOARD:") {
+			for (int i = 0; i < 64; i++) {
+				is>>buff;
+				if(buff == "NOPE,") {
+					m_pieceArray[i] = nullptr;
+				}
+				else if(buff == "PIECE") {
+					is>>col>>pcTyp;
+					if(is.good()){
+						int x = i/8;
+						int y = i%8;
+						placePieceAt(col, Position(x,y), pcTyp);
+						char c = 0;
+						is>>c;
+						if(is.good() && c == ',') {
+							m_pieceArray[i]->Deserialize(is);
+						}
+						if(!is.good()) {
+							throw std::exception("File format error");
+						}
+					}
+				}
+			}
+			for (int i = 0; i < 64; i++) {
+				is>>buff;
+				if(buff == "NOPE,") {
+					m_savedArray[i] = nullptr;
+				}
+				else if(buff == "PIECE") {
+					is>>col>>pcTyp;
+					if(is.good()){
+						int x = i/8; //Row
+						int y = i%8; //Column
+						placePieceAt(col, Position(y+1,x+1), pcTyp);
+						char c = 0;
+						is>>c;
+						if(is.good() && c == ',') {
+							m_savedArray[i]->Deserialize(is);
+						}
+						if(!is.good()) {
+							throw std::exception("File format error");
+						}
+					}
+				}
+			}
+		}
+		throw std::exception("File format error");
+	}
+
 	void Board::placePieceAt(Color color, const Position& pos, PieceType pieceType) {
 		Piece*& piecePtr = m_at(pos);
 		if(piecePtr == nullptr) {
@@ -74,18 +150,18 @@ namespace ch {
 
 	void Board::deletePieceAt(const Position& pos) {
 		Piece*& piecPtr = m_at(pos);
-			if(piecPtr != nullptr) {
-				std::vector<Piece*>& piecesV = (piecPtr->getColor() == Color::WHITE)? m_whitePieces : m_blackPieces;
-				for(auto it = piecesV.begin(); it != piecesV.end(); it++) {
-					if((*it) == piecPtr) {//The piece's pointer found in the piece list
-						piecesV.erase(it);
-						m_deleteList.push_back(piecPtr);
-						piecPtr = nullptr;
-						return;
-					}
+		if(piecPtr != nullptr) {
+			std::vector<Piece*>& piecesV = (piecPtr->getColor() == Color::WHITE)? m_whitePieces : m_blackPieces;
+			for(auto it = piecesV.begin(); it != piecesV.end(); it++) {
+				if((*it) == piecPtr) {//The piece's pointer found in the piece list
+					piecesV.erase(it);
+					m_deleteList.push_back(piecPtr);
+					piecPtr = nullptr;
+					return;
 				}
-				throw std::logic_error("The piece that should be deleted is not in the vector");
 			}
+			throw std::logic_error("The piece that should be deleted is not in the vector");
+		}
 
 	}
 

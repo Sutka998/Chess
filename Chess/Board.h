@@ -2,9 +2,10 @@
 #include "Piece.h"
 #include "PiecesH.h"
 #include <vector>
+#include <string>
 
 namespace ch {
-	class Board {
+	class Board : public ISerializable{
 		//0: A1, 1: A2 2: A3 ... 8: B1 ... 63: H8
 		Piece* m_pieceArray[64];
 		Piece* m_savedArray[64];
@@ -29,6 +30,9 @@ namespace ch {
 
 		void save();
 		void undo();
+
+		void Serialize(std::ofstream&) const;
+		void Deserialize(std::ifstream&);
 
 		void placePieceAt(Color color, const Position& pos, PieceType pieceType);
 

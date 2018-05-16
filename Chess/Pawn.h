@@ -14,6 +14,9 @@ namespace ch {
 		void m_hitGridAdd_black();
 	public:
 		//If the pawn can be removed by EnPassant, it is true, should be reseted from the outside
+		void Serialize(std::ofstream&) const;
+		void Deserialize(std::ifstream&);
+
 		bool m_canBeEnPass;
 		const static PieceType pieceType;
 		Pawn(Color, const Position&);
