@@ -31,7 +31,7 @@ namespace ch {
 		void save();
 		void undo();
 
-		void Serialize(std::ofstream&) const;
+		void Serialize(std::ofstream&);
 		void Deserialize(std::ifstream&);
 
 		void placePieceAt(Color color, const Position& pos, PieceType pieceType);

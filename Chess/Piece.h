@@ -74,7 +74,7 @@ namespace ch {
 		virtual void Move_Hit(const Position&);
 
 		//Interface
-		virtual void Serialize(std::ofstream&) const;
+		virtual void Serialize(std::ofstream&) ;
 		virtual void Deserialize(std::ifstream&);
 
 		//Getters

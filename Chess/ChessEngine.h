@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace ch {
-	class ChessEngine {
+	class ChessEngine : public ISerializable {
 		Color m_currCol;
 
 		enum side_t{QUEENSIDE, KINGSIDE};
@@ -30,8 +30,8 @@ namespace ch {
 		const Position* m_currKingPos;
 		void m_setCurrKingPos() {
 			if(m_whiteKing != nullptr && m_blackKing != nullptr) {
-				m_currKingPos = (m_currCol == Color::WHITE) ?
-				&(m_whiteKing->getPosition()) : &(m_blackKing->getPosition());
+				m_currKingPos = &((m_currCol == Color::WHITE) ?
+				m_whiteKing->getPosition() : m_blackKing->getPosition());
 			}
 		}
 
@@ -97,6 +97,11 @@ namespace ch {
 			m_setCurrKingPos();
 		}
 		bool ProcessStep(const Position& src, const Position& dst);
+
+		//Serialize
+		void Serialize(std::ofstream&)  ;
+		void Deserialize(std::ifstream&);
+
 		const Color& getCurrentColor() const { return m_currCol;}
 		~ChessEngine(void);
 	};

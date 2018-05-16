@@ -108,7 +108,7 @@ namespace ch {
 		throw std::invalid_argument("Piece::Move_Hit Position is not in the grid. Unable to move the piece.");
 	}
 
-	void Piece::Serialize(std::ofstream& os) const {
+	void Piece::Serialize(std::ofstream& os)  {
 		os<<m_position.getColumn().number<<", "<<m_position.getRow()<<", "<<m_isMoved<<"\n";
 	}
 
@@ -124,7 +124,7 @@ namespace ch {
 				is>>c;
 				is>>m_isMoved;
 				if(is.good() && c == ',') {
-					is>>c;
+					c = is.get();
 					if(is.good() && c == '\n') {
 						m_evalHitGrid();
 						m_evalMoveGrid();

@@ -30,8 +30,9 @@ namespace ch {
 		}
 	}
 
-	void Board::Serialize(std::ofstream& os) const {
+	void Board::Serialize(std::ofstream& os) {
 		os<<"BOARD: ";
+		save();
 		for (int i = 0; i<64; i++) {
 			if(m_pieceArray[i] == nullptr) {
 				os<<"NOPE, ";
@@ -42,25 +43,19 @@ namespace ch {
 				m_pieceArray[i]->Serialize(os);
 			}
 		}
-		for (int i = 0; i<64; i++) {
-			if(m_savedArray[i] == nullptr) {
-				os<<"NOPE, ";
-			} else {
-				os<<"PIECE ";
-				os<<m_savedArray[i]->getColor() <<" ";
-				os<<m_savedArray[i]->pieceType<<" , ";
-				m_pieceArray[i]->Serialize(os);
-			}
-		}
 	}
 
 	void Board::Deserialize(std::ifstream& is) {
 		std::string buff; Color col; PieceType pcTyp;
+		save();
 		is>>buff;
 		if(buff == "BOARD:") {
+			m_whitePieces.clear();
+			m_blackPieces.clear();
 			for (int i = 0; i < 64; i++) {
 				is>>buff;
 				if(buff == "NOPE,") {
+					delete m_pieceArray[i];
 					m_pieceArray[i] = nullptr;
 				}
 				else if(buff == "PIECE") {
@@ -68,42 +63,24 @@ namespace ch {
 					if(is.good()){
 						int x = i/8;
 						int y = i%8;
-						placePieceAt(col, Position(x,y), pcTyp);
+						delete m_pieceArray[i];
+						m_pieceArray[i] = nullptr;
+						placePieceAt(col, Position(y+1,x+1), pcTyp);
 						char c = 0;
 						is>>c;
 						if(is.good() && c == ',') {
 							m_pieceArray[i]->Deserialize(is);
 						}
 						if(!is.good()) {
-							throw std::exception("File format error");
+							throw std::exception("File format error\n");
 						}
 					}
 				}
 			}
-			for (int i = 0; i < 64; i++) {
-				is>>buff;
-				if(buff == "NOPE,") {
-					m_savedArray[i] = nullptr;
-				}
-				else if(buff == "PIECE") {
-					is>>col>>pcTyp;
-					if(is.good()){
-						int x = i/8; //Row
-						int y = i%8; //Column
-						placePieceAt(col, Position(y+1,x+1), pcTyp);
-						char c = 0;
-						is>>c;
-						if(is.good() && c == ',') {
-							m_savedArray[i]->Deserialize(is);
-						}
-						if(!is.good()) {
-							throw std::exception("File format error");
-						}
-					}
-				}
-			}
+			save();
+			return;
 		}
-		throw std::exception("File format error");
+		throw std::exception("File format error\n");
 	}
 
 	void Board::placePieceAt(Color color, const Position& pos, PieceType pieceType) {
@@ -177,15 +154,11 @@ namespace ch {
 	}
 
 	Board::~Board() {
-		try {
-			for (int i = 0; i < 64 ; i++) {
-				delete m_pieceArray[i];
-				delete m_savedArray[i];
-			}
+		save();
+		for (int i = 0; i < 64 ; i++) {
+			delete m_pieceArray[i];
 		}
-		catch(...) {
 
-		}
 	}
 
 }

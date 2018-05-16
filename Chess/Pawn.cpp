@@ -8,7 +8,7 @@ namespace ch {
 		m_evalHitGrid();
 	}
 
-	void Pawn::Serialize(std::ofstream& os) const {
+	void Pawn::Serialize(std::ofstream& os)  {
 		os<<m_canBeEnPass<<", ";
 		Piece::Serialize(os);
 	}

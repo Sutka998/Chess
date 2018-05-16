@@ -56,6 +56,27 @@ namespace ch {
 		return false;
 	}
 
+	void ChessEngine::Serialize(std::ofstream& os)  {
+		os<<m_currCol<<" , "<<m_flags.isCheck<<" , "<<m_flags.isMate<<"\n";
+	}
+
+	void ChessEngine::Deserialize(std::ifstream& is) {
+		char c = 0;
+		is>>m_currCol>>c;
+		if(c == ',') {
+			is>>m_flags.isCheck>>c;
+			if(c == ',') {
+				is>>m_flags.isMate;
+				c = is.get();
+				if(c == '\n') {
+					m_setCurrKingPos();
+					return;
+				}
+			}
+		}
+		throw std::exception("File format error");
+	}
+
 	bool ChessEngine::m_castlingCheck(const Position& src, const Position& dest) {
 		Piece* srcPiece = m_Board.getPieceAt(src);
 		//Castling check and process
@@ -102,20 +123,19 @@ namespace ch {
 			m_Board.movePiece(kingFrom, rookTo); //Step one with the king, rookTo field is next to the king
 			m_checkEvaluate(rookTo); //The king shouldn't cross "check"
 			if(m_activeCheck) {
-				kingCstl->Move_Hit(kingFrom); //Moving back the king
-				m_Board.undo();
+				m_Board.undo(); //Moving back the king
 				return false;
 			}
-			m_Board.movePiece(rookTo, kingTo); //Moving the king to the final position (it was on the rookTo field)
+			m_Board.movePiece(rookTo, kingTo); //Moving the king to the final position (it was on the kingFrom field)
 			m_Board.movePiece(rookFrom, rookTo); //Moving the rook to its position
 			m_checkEvaluate(kingTo);
 			if(m_activeCheck) { //Check occurred
-				kingCstl->Move_Hit(rookTo);
-				kingCstl->Move_Hit(kingFrom); //Moving back the king to its original position.
 				m_Board.undo();
 				return false;
 			}
-			//Movement was ok, step completed, moving the rook to its position
+			//Movement was ok, step completed, moving the rook and king to its position
+			kingCstl->Move_Hit(rookTo);
+			kingCstl->Move_Hit(kingTo);
 			rookCstl->Move_Hit(rookTo);
 			return true;
 		}
