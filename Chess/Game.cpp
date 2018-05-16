@@ -36,7 +36,7 @@ namespace ch {
 	}
 
 	void Game::m_genBasicBoard(){
-		for (int i = 3; i < 8; i++) {
+		for (int i = 0; i < 8; i++) {
 			m_board.placePieceAt(Color::WHITE, Position(Column(i+1), 2), PieceType::PAWN);
 			m_board.placePieceAt(Color::BLACK, Position(Column(i+1), 7), PieceType::PAWN);
 		}
@@ -44,11 +44,11 @@ namespace ch {
 		m_board.placePieceAt(Color::BLACK, Position(Column::CL::E, 8), PieceType::KING);
 		m_engine.setKing((King*)m_board.getPieceAt(Position(Column::CL::E, 1)), (King*)m_board.getPieceAt(Position(Column::CL::E, 8)));
 
-		//	m_board.placePieceAt(Color::WHITE, Position(Column::CL::A, 1), PieceType::ROOK);
-		//	m_board.placePieceAt(Color::BLACK, Position(Column::CL::A, 8), PieceType::ROOK);
-		m_board.placePieceAt(Color::WHITE, Position(Column(1), 7), PieceType::PAWN);
-		//	m_board.placePieceAt(Color::WHITE, Position(Column::CL::B, 1), PieceType::KNIGHT);
-		//	m_board.placePieceAt(Color::BLACK, Position(Column::CL::B, 8), PieceType::KNIGHT);
+		m_board.placePieceAt(Color::WHITE, Position(Column::CL::A, 1), PieceType::ROOK);
+		m_board.placePieceAt(Color::BLACK, Position(Column::CL::A, 8), PieceType::ROOK);
+
+		m_board.placePieceAt(Color::WHITE, Position(Column::CL::B, 1), PieceType::KNIGHT);
+		m_board.placePieceAt(Color::BLACK, Position(Column::CL::B, 8), PieceType::KNIGHT);
 
 		m_board.placePieceAt(Color::WHITE, Position(Column::CL::C, 1), PieceType::BISHOP);
 		m_board.placePieceAt(Color::BLACK, Position(Column::CL::C, 8), PieceType::BISHOP);

@@ -3,6 +3,7 @@
 #include "Pawn.h"
 #include "Board.h"
 #include "King.h"
+#include <vector>
 
 namespace ch {
 	class ChessEngine {
@@ -60,22 +61,22 @@ namespace ch {
 			bool isMate;
 		};
 
-		template <class T>
-		bool m_isIntSectEmpty(const vector<T>& inA, vector<T>::iterator bBegin, vector<T>::iterator bEnd) const{
-			for (auto it = inA.begin(); it != inA.end(); it++) {
-				for (auto itB = bBegin; itB != bEnd; it++) {
-					if((*it) == (*itB)){
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-
+// 		template <class T>
+// 		bool m_isIntSectEmpty(const std::vector<T>& inA, std::vector<T, std::allocator<T>>::iterator bBegin, std::vector<T, std::allocator<T>>::iterator bEnd) {
+// 			for (auto it = inA.begin(); it != inA.end(); it++) {
+// 				for (auto itB = bBegin; itB != bEnd; it++) {
+// 					if((*it) == (*itB)){
+// 						return false;
+// 					}
+// 				}
+// 			}
+// 			return true;
+// 		}
+		
 		bool m_checkStraightDir(const Position& currPos, int& alliedPieces, const Position& kingPos); //When returns true, the outer loop should be broken.
 		void m_checkKnightDir(const Position& kingPos);
 		void m_checkEvaluate(const Position& kingPos);
-		bool m_checkForMate();
+		void m_checkForMate() {}
 		bool m_canKingAvoidCheck();
 		void m_roundEnd();
 
