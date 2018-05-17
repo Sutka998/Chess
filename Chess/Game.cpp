@@ -77,11 +77,18 @@ namespace ch {
 			try
 			{
 				m_processUserIn();
+				m_processCommand();
 			}
 			catch (std::string str) {
 				msg = str;
 			}
-			if(m_commandCache == commands::EXIT){
+			catch (std::exception e) {
+				msg = e.what();
+			}
+			catch(...) {
+				msg = "Unknown error occurred.\n";
+			}
+			if(m_commandCache == commands::EXIT || m_commandCache == commands::RESTART){
 				break;
 			}
 		}
@@ -132,9 +139,7 @@ namespace ch {
 			}
 			m_makeStep(src, dest);
 			return;
-
 		}
-
 	}
 
 	void Game::m_makeStep(const Position& src, const Position& dest) {
@@ -145,22 +150,39 @@ namespace ch {
 	}
 
 	void Game::m_processCommand() {
-
-		switch (m_commandCache)
-		{
-		case ch::Game::commands::NOPE:
-			break;
-		case ch::Game::commands::EXIT:
-			break;
-		case ch::Game::commands::RESTART:
-			break;
-		case ch::Game::commands::SAVE:
-			break;
-		case ch::Game::commands::LOAD:
-			break;
-		default:
-			break;
+		std::string a;
+		try{
+			switch (m_commandCache)
+			{
+			case ch::Game::commands::RESTART:
+				return;
+			case ch::Game::commands::EXIT:
+				return;
+			case ch::Game::commands::SAVE:
+				m_out<<"Give a filename without extension:\n";
+				std::cin>>a;
+				if(a == "") {
+					throw std::string("Invalid file name\n");
+				}
+				m_save(a);
+				break;
+			case ch::Game::commands::LOAD:
+				m_out<<"Give a filename without extension:\n";
+				std::cin>>a;
+				if(a == "") {
+					throw std::string("Invalid file name\n");
+				}
+				m_load(a);
+				break;
+			default:
+				break;
+			}
 		}
+		catch(...) {
+			m_commandCache = commands::NOPE;
+			throw;
+		}
+		m_commandCache = commands::NOPE;
 	}
 
 	ch::PieceType Game::m_askSwap() {
@@ -187,9 +209,45 @@ namespace ch {
 		}
 	}
 
+	void Game::m_save(std::string filename) {
+		std::string FNAME = filename+".che";
+		std::ofstream os(FNAME);
+		m_board.Serialize(os);
+		m_engine.Serialize(os);
+		os.close();
+	}
+
+	void Game::m_load(std::string filename) {
+		std::string FNAME = filename+".che";
+		std::ifstream is(FNAME);
+		m_board.Deserialize(is);
+		Piece *kingW = nullptr, *kingB = nullptr;
+		for (auto iter = m_board.it_Begin(Color::WHITE); iter != m_board.it_End(Color::WHITE); iter++) {
+			if((*iter)->pieceType == PieceType::KING) {
+				kingW = *iter;
+				break;
+			}
+		}
+		for (auto iter = m_board.it_Begin(Color::BLACK); iter != m_board.it_End(Color::BLACK); iter++) {
+			if((*iter)->pieceType == PieceType::KING) {
+				kingB = *iter;
+				break;
+			}
+		}
+		m_engine.setKing((King*)kingW, (King*)kingB);
+		m_engine.Deserialize(is);
+		is.close();
+	}
+	/** \brief To start a new game. It starts the game loop, and everything for the game.
+	*/
 	void Game::NewGame() {
-		m_createBoard(startPos::BASIC);
-		m_loop();
+		do{
+			m_commandCache = commands::NOPE;
+			m_createBoard(startPos::BASIC);
+			m_loop();
+			m_board = Board();
+			m_engine.ResetEngine();
+		}while(m_commandCache == commands::RESTART);
 	}
 
 	Game::~Game(void)

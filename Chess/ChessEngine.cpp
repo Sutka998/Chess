@@ -11,6 +11,12 @@ namespace ch {
 		m_Board.save();
 	}
 
+	/** \brief Processes the step request arriving from the outside
+	* \details 
+	*\param [in] The source position
+	*\param [in] The destination position
+	* \return true, if it was succeed, false, if something went wrong.
+	*/
 	bool ChessEngine::ProcessStep(const Position& src, const Position& dst) {
 		if(m_whiteKing == nullptr || m_blackKing == nullptr) { throw std::invalid_argument("The kings can not be nullPtr");}
 		Piece* srcPiece = m_Board.getPieceAt(src);
@@ -55,11 +61,13 @@ namespace ch {
 		}
 		return false;
 	}
-
+	/** \brief Serializes the class into an output file stream.
+	*/
 	void ChessEngine::Serialize(std::ofstream& os)  {
 		os<<m_currCol<<" , "<<m_flags.isCheck<<" , "<<m_flags.isMate<<"\n";
 	}
-
+	/** \brief Deserializes the class from an input file stream.
+	*/
 	void ChessEngine::Deserialize(std::ifstream& is) {
 		char c = 0;
 		is>>m_currCol>>c;
@@ -77,6 +85,12 @@ namespace ch {
 		throw std::exception("File format error");
 	}
 
+	/** \brief Checks, whether the player is going to castle, or not.
+	* \details If the player is castling, it makes the steps
+	*\param [in] The source position
+	*\param [in] The destination position
+	* \return true, if the player successfully castled.
+	*/
 	bool ChessEngine::m_castlingCheck(const Position& src, const Position& dest) {
 		Piece* srcPiece = m_Board.getPieceAt(src);
 		//Castling check and process
@@ -102,6 +116,12 @@ namespace ch {
 		return false;
 	}
 
+	/** \brief Assistant function for the castling check.
+	* \details When this function called, the player wants castle. This functions checks for "check" situations, and makes movement.
+	*\param [in] The castling side
+	*\param [in] The king which one castles.
+	* \return true, when castling was successfully completed.
+	*/
 	bool ChessEngine::m_tryCastle(side_t side, Piece* kingCstl) {
 		unsigned row = (m_currCol == Color::WHITE)? 1 : 8;
 		Position kingFrom(Column::CL::E, row);
@@ -140,7 +160,13 @@ namespace ch {
 			return true;
 		}
 	}
-
+	/** \brief Assistant function for the ProcessStep function.
+	* \details Moves the piece first, then checks for check situation. If the moving of the piece doesn't cause self check, the move is completed.
+	*\param [in] The source position
+	*\param [in] The destination position
+	*\param [in] The type of the movement (move, hit)
+	* \return true, when the step was executed.
+	*/
 	bool ChessEngine::m_tryStepExecute(const Position& src, const Position& dest, MovType mvType) {
 		Piece* srcPiece = m_Board.getPieceAt(src);
 
@@ -179,7 +205,12 @@ namespace ch {
 		}
 		return true;
 	}
-
+	/** \brief Assistant function for the ProcessStep function, this function evaluates the step of the knight.
+	* \details We don't have to check, if the way is free between the target and our piece.
+	*\param [in] The source position
+	*\param [in] The destination position
+	* \return true, if the step was executed.
+	*/
 	bool ChessEngine::m_tryKnightStep(const Position& src, const Position& dest) {
 		Piece* currKnight = m_Board.getPieceAt(src);
 
@@ -214,7 +245,12 @@ namespace ch {
 		}
 		return true;
 	}
-
+	/** \brief Tells, whether the way is free between two fields. They have to be on the same line (straight), else exception is thrown.
+	* \details
+	*\param [in] The source position
+	*\param [in] The destination position
+	* \return true, if the way is free.
+	*/
 	bool ChessEngine::m_isWayFree(const Position& src, const Position& dest) {
 		lineITER::iterDIR itDir;
 		if(src.getRow() == dest.getRow()) { //Same row
@@ -258,7 +294,12 @@ namespace ch {
 		}
 		return true;
 	}
-	//It is connected with the check calculation
+	/** \brief Assistant function for the checkEvaluate. Should be called in a for loop.
+	* \details Gets the current iterator position, and check for piece on that position. If it is enemy, it returns true. Counts allied pieces between.
+	*\param [in] The current iterator position
+	*\param [in] Reference to the allied piece counter variable
+	* \return true, if the outer for loop should be broken => the algorithm find an enemy piece.
+	*/
 	bool ChessEngine::m_checkStraightDir(const Position& currPos, int& alliedPieces, const Position& kingPos) {
 		Piece* currPiece = m_Board.getPieceAt(currPos);
 		if((currPiece != nullptr)) {
@@ -279,7 +320,10 @@ namespace ch {
 		}
 		return false; //Nothing was found, continuing the loop
 	}
-	//For check check, checks for the knight directions
+	/** \brief Checks if the king is in check from enemy knight. Sets m_activeCheck flag, if check detected.
+	* \details
+	*\param [in] The king's current position.
+	*/
 	void ChessEngine::m_checkKnightDir(const Position& kingPos) {
 		//8 different directions to check
 		intPair argArray[8] = {{1,2}, {-1, 2}, {2, 1}, {2, -1}, {1,-2}, {-1, -2}, {-2, 1}, {-2, -1}};
@@ -304,7 +348,10 @@ namespace ch {
 
 		}
 	}
-
+	/** \brief Evaluates check for a current king position. Sets m_activeCheck flag, if check detected.
+	* \details
+	*\param [in] The current king's position
+	*/
 	void ChessEngine::m_checkEvaluate(const Position& kingPos) {
 		m_activeCheck = false;
 
@@ -401,6 +448,10 @@ namespace ch {
 
 	}*/
 	//For mate check
+	/** \brief Checks, whether the king can step out from check.
+	* \details
+	* \return true, if it can.
+	*/
 	bool ChessEngine::m_canKingAvoidCheck(){
 		const Piece& currKing = *((m_currCol == Color::WHITE)? m_whiteKing : m_blackKing);
 
@@ -421,7 +472,9 @@ namespace ch {
 		m_Board.undo();
 		return false;
 	}
-
+	/** \brief Administration function, should be called at the end of the round.
+	* \details Saves the board, calculates check/mate for the enemy player, switches color, and current king.
+	*/
 	void ChessEngine::m_roundEnd() {
 
 		m_currCol = (m_currCol == Color::WHITE) ? Color::BLACK : Color::WHITE; //Enemy's next turn, swapping player
@@ -431,6 +484,14 @@ namespace ch {
 		//Setting up the flags
 		m_flags.isCheck = m_activeCheck;
 		m_checkForMate();
+	}
+
+	void ChessEngine::ResetEngine() {
+		m_currCol = Color::WHITE;
+		m_flags.isCheck = false;
+		m_flags.isMate = false;
+		m_activeCheck = false;
+		m_Board.save();
 	}
 
 	ChessEngine::~ChessEngine(void)

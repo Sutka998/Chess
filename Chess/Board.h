@@ -46,6 +46,8 @@ namespace ch {
 			return m_pieceArray[(pos.getRow()-1)*8 + (pos.getColumn().number -1)];
 		}
 
+		void operator=(const Board&);
+
 		~Board();
 	};
 }

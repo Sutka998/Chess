@@ -153,6 +153,20 @@ namespace ch {
 		throw std::logic_error("Destination is not nullptr.");
 	}
 
+	void Board::operator=(const Board& that) {
+		save();
+		m_whitePieces.clear();
+		m_blackPieces.clear();
+		for(int i = 0; i<64; i++) {
+			delete m_pieceArray[i];
+			m_pieceArray[i] = nullptr;
+			if(that.m_pieceArray[i] != nullptr) {
+				placePieceAt(that.m_pieceArray[i]->getColor(), that.m_pieceArray[i]->getPosition(), that.m_pieceArray[i]->pieceType);
+			}
+		}
+		save();
+	}
+
 	Board::~Board() {
 		save();
 		for (int i = 0; i < 64 ; i++) {
