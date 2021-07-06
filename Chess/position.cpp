@@ -2,6 +2,9 @@
 #include <stdexcept>
 
 namespace ch {
+	/**
+	* \file Position.cpp
+	*/
 
 	Position::Position (Column c, unsigned short row) 
 		: m_column(c) {

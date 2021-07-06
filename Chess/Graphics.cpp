@@ -1,6 +1,13 @@
 #include "Graphics.h"
 
 namespace ch{
+	/**
+	* \file Graphics.cpp
+	* \brief Renders the game table for the user.
+	*/
+
+	/** \brief Renders the image, depending on the viewer mode.
+		*/
 	void Graphics::renderImg() {
 		if(m_mode == graphicsMode::CONSOLE) {
 			system("cls");

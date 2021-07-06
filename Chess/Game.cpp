@@ -2,6 +2,11 @@
 
 namespace ch {
 
+	/**
+	* \file Game.cpp
+	* \brief The game class, manages the user in-and output, and the control of the functions.
+	*/
+
 	std::ostream& operator<<(std::ostream& os, ch::Color col) {
 		if(col == ch::Color::WHITE) {
 			os << "WHITE";
@@ -10,7 +15,8 @@ namespace ch {
 		}
 		return os;
 	}
-
+	/** \brief Constructor for a game. Creates a game with a board, and with an engine.
+	*/
 	Game::Game()
 		: m_engine(m_board), m_graphics(m_out), m_commandCache(commands::NOPE)
 	{
@@ -122,7 +128,7 @@ namespace ch {
 			}
 		}
 		else if(str == "help"){
-			m_out<<"game exit, game restart, game save, game load; help; move the piece: X# Y#; X, Y are letters, # are numbers\n";
+			throw std::string("game exit, game restart, game save, game load; help; move the piece: X# Y#; X, Y are letters, # are numbers\n");
 		}
 		else {
 			char c, d;
@@ -238,7 +244,7 @@ namespace ch {
 		m_engine.Deserialize(is);
 		is.close();
 	}
-	/** \brief To start a new game. It starts the game loop, and everything for the game.
+	/** \brief To start a new game. It starts the game loop, and everything for the game. Returns, if the user exited from the game.
 	*/
 	void Game::NewGame() {
 		do{

@@ -1,14 +1,17 @@
 #include "Board.h"
 
 namespace ch {
-
+	/** \brief Construct a board, with zero pieces.
+	*/
 	Board::Board()
 	{
 		for (int i = 0; i < 64; i++) {
 			m_pieceArray[i] = nullptr;
 		}
 	}
-
+	/** \brief Saves the board's current state.
+	* \details The pieces are saved in a ghost board, and this state can be reseted until you save the board again.
+	*/
 	void Board::save() {
 		for (int i = 0; i < m_deleteList.size(); i++) {
 			delete m_deleteList[i]; //deleting delete list pointers
@@ -18,7 +21,9 @@ namespace ch {
 			m_savedArray[i] = m_pieceArray[i]; //Saving the data
 		}
 	}
-
+	/** \brief Undoes all changes till the last save.
+	* \details
+	*/
 	void Board::undo() {
 		for (int i = 0; i < m_deleteList.size(); i++) {
 			//Putting back the piece to the Piece list
@@ -29,7 +34,9 @@ namespace ch {
 			m_pieceArray[i] = m_savedArray[i]; //Loading back the data
 		}
 	}
-
+	/** \brief Serialize the board into a given output file stream.
+		*\param [in] The output file stream.
+		*/
 	void Board::Serialize(std::ofstream& os) {
 		os<<"BOARD: ";
 		save();
@@ -44,7 +51,10 @@ namespace ch {
 			}
 		}
 	}
-
+	/** \brief Deserialize the board from a given input file stream.
+		*\details Throws exception, if the file format is not OK.
+		*\param [in] The input file stream.
+		*/
 	void Board::Deserialize(std::ifstream& is) {
 		std::string buff; Color col; PieceType pcTyp;
 		save();
@@ -82,7 +92,12 @@ namespace ch {
 		}
 		throw std::exception("File format error\n");
 	}
-
+	/** \brief Places a new piece on the given position. Also adds it to the corresponding piece list.
+	* \details The board should have contain nullptr on the position, where the piece is placed on. Throws exception, if you are trying to place on a not nullptr.
+	*\param [in] The piece's color, what should be placed.
+	*\param [in] Position of where the piece should go.
+	*\param [in] The type of the piece.
+	*/
 	void Board::placePieceAt(Color color, const Position& pos, PieceType pieceType) {
 		Piece*& piecePtr = m_at(pos);
 		if(piecePtr == nullptr) {
@@ -124,7 +139,10 @@ namespace ch {
 		}
 		throw std::logic_error("Destination is not nullptr.");
 	}
-
+	/** \brief Removes a piece from the corresponding position. If you try to delete a nullptr, nothing will happen.
+	* \details The removed piece is stored in a temporaly storage, and upon and undo() it could be reseted, but after a save(), the temporary storage is deleted. Also removes the piece from the pieceList
+	*\param [in] position to delete.
+	*/
 	void Board::deletePieceAt(const Position& pos) {
 		Piece*& piecPtr = m_at(pos);
 		if(piecPtr != nullptr) {
@@ -141,7 +159,11 @@ namespace ch {
 		}
 
 	}
-
+	/** \brief Moves a piece on the board (does not call the piece's moveHit function), the destination should be a nullptr.
+	* \details If the destination is not nullptr, exception thrown. The undo() resets theese movement processes to the last save()'s status.
+	*\param [in] Source position
+	*\param [in] Destination position.
+	*/
 	void Board::movePiece(const Position& from, const Position& dest) {
 		Piece*& destPtr = m_at(dest);
 		if(destPtr == nullptr) {
@@ -152,7 +174,10 @@ namespace ch {
 		}
 		throw std::logic_error("Destination is not nullptr.");
 	}
-
+	/** \brief An operator=, to make this board equal to an another.
+	* \details
+	*\param [in] The another board.
+	*/
 	void Board::operator=(const Board& that) {
 		save();
 		m_whitePieces.clear();

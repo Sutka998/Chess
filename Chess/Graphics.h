@@ -3,6 +3,10 @@
 #include "Board.h"
 
 namespace ch {
+
+	/**
+	* \file Graphics.h
+	*/
 	class Graphics
 	{
 	public:
@@ -13,14 +17,18 @@ namespace ch {
 
 		void renderImg();
 
-		//setters, getters
-		void setBoard(Board* brd) {
+		/** \brief Sets the board for the console render mode.
+		*\param [in] a const Board*
+		*/
+		void setBoard(const Board* brd) {
 			m_board= brd;
 		}
+		/** \brief Getter for the current board.
+		*/
 		const ch::Board* getBoard() {return m_board;}
 		~Graphics(void);
 	private:
-		ch::Board* m_board;
+		const ch::Board* m_board;
 		graphicsMode m_mode;
 		std::ostream& m_cout;
 

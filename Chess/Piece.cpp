@@ -52,12 +52,21 @@ namespace ch {
 		}
 		return is;
 	}
-
+	/** \brief Constructor for a piece.
+		*\param [in] The piece's color
+		*\param [in] The piece's starting position
+		*\param [in] The type of the piece.
+		*/
 	Piece::Piece(Color color, const Position& position, PieceType pcType) 
 		: m_color(color), m_position(position),	m_isMoved(false), pieceType(pcType),
 		m_mGridEvaled(false), m_hGridEvaled(false), m_isCacheValid(false)
 	{	}
-
+	/** \brief Evaluates whether the piece can move, or hit on a specific location.
+	* \details 
+	*\param [in] The destination position 
+	*\param [in] The movement type, HIT, or MOVE
+	* \return true, if the piece can move, or hit on the given location.
+	*/
 	bool Piece::canMoveHit(const Position& pos, MovType mvtyp) const {
 		//Is there any cached value
 		if(m_isCacheValid && (pos == m_canMoveHitCache)){
@@ -98,7 +107,11 @@ namespace ch {
 		m_hGridEvaled = true;
 		return;
 	}
-
+	/** \brief Tries to move the piece to the target position. Virtual, can be overloaded.
+	* \details Checks, if the piece can moved there. If the given position is checked before with the canMoveHit function (which returned true), it returns true immediately, because of the cache.
+	*\param [in] The destination position 
+	* \return true, if the piece is moved to the given location.
+	*/
 	void Piece::Move_Hit(const Position& pos) {
 		if( canMoveHit(pos, MovType::MOVE) || canMoveHit(pos, MovType::HIT) ) {
 			m_move(pos);
@@ -107,11 +120,17 @@ namespace ch {
 		}
 		throw std::invalid_argument("Piece::Move_Hit Position is not in the grid. Unable to move the piece.");
 	}
-
+	/** \brief Serializes a piece into a given output file stream.
+	* \details 
+	*\param [in] reference to the output file stream.
+	*/
 	void Piece::Serialize(std::ofstream& os)  {
 		os<<m_position.getColumn().number<<", "<<m_position.getRow()<<", "<<m_isMoved<<"\n";
 	}
-
+	/** \brief Deserializes a piece from a given input file stream.
+	* \details 
+	*\param [in] reference to the input file stream.
+	*/
 	void Piece::Deserialize(std::ifstream& is) {
 		unsigned column, row;
 		char c;

@@ -2,7 +2,17 @@
 #include <stdexcept>
 
 namespace ch {
+	/**
+	* \file ChessEngine.cpp
+	* \brief The source code of the chessEngine, responds to the chess rules.
+	*/
 
+	/** \brief Chess engine constructor
+	* \details
+	*\param [in] Reference to the chess board. The engine works on this board.
+	*\param [in] Pointer to the white king, default nullptr. Must be initialized now, or later.
+	*\param [in] Pointer to the black king, default nullptr. Must be initialized now, or later.
+	*/
 	ChessEngine::ChessEngine(Board& chessBoard, const King* whiteKing, const King* blackKing)
 		: m_Board(chessBoard), m_whiteKing(whiteKing), m_blackKing(blackKing), gameFlags(m_flags)
 	{
@@ -376,75 +386,75 @@ namespace ch {
 	}
 
 	/*void ChessEngine::m_checkForMate() {
-		std::vector<Position> checkLine;
-		m_activeCheck = false;
-		//CAN the king step? check#1
-		if(m_canKingAvoidCheck()) { //King could step away
-			return;
-		}
+	std::vector<Position> checkLine;
+	m_activeCheck = false;
+	//CAN the king step? check#1
+	if(m_canKingAvoidCheck()) { //King could step away
+	return;
+	}
 
-		if(m_flags.isCheck) { //If we are in check, we have to evaluate the check line.
-			for (int i = 0; i < 8; i++) {//8 directions
-				int alliedPieces = 0;
-				checkLine.clear();//Delete
-				auto iter = lineITER(static_cast<lineITER::iterDIR>(i), *m_currKingPos);//We need the position dependent on the board
-				iter++;
-				for(; !iter.isFinished(); iter++) {
-					checkLine.push_back(*iter);//Adding the fields, on we are going
-					if(m_checkStraightDir((*iter), alliedPieces, *m_currKingPos) == true) {
-						break; //Found enemy piece
-					}
-				}
-				if(m_activeCheck) { //We find the check line, if we didn't, the check comes from knight
-					break;
-				}
-			}
-			if(m_activeCheck) {//We broke the loop
-				//Going trough the white pieces
-				for (auto piter = m_Board.it_Begin(m_currCol);
-					piter != m_Board.it_End(m_currCol); piter++ ) {
-						//Not king, can it block the check? 
-						if((*piter)->pieceType != PieceType::KING) {
-							//If we can step, it is not mate; checkLine.end()-1 => we are skipping the last element, because it is enemy
-							if (!m_isIntSectEmpty<Position>((*piter)->getMoveGrid(), checkLine.begin(), checkLine.end()-1)) {
-								return ;
-							}
+	if(m_flags.isCheck) { //If we are in check, we have to evaluate the check line.
+	for (int i = 0; i < 8; i++) {//8 directions
+	int alliedPieces = 0;
+	checkLine.clear();//Delete
+	auto iter = lineITER(static_cast<lineITER::iterDIR>(i), *m_currKingPos);//We need the position dependent on the board
+	iter++;
+	for(; !iter.isFinished(); iter++) {
+	checkLine.push_back(*iter);//Adding the fields, on we are going
+	if(m_checkStraightDir((*iter), alliedPieces, *m_currKingPos) == true) {
+	break; //Found enemy piece
+	}
+	}
+	if(m_activeCheck) { //We find the check line, if we didn't, the check comes from knight
+	break;
+	}
+	}
+	if(m_activeCheck) {//We broke the loop
+	//Going trough the white pieces
+	for (auto piter = m_Board.it_Begin(m_currCol);
+	piter != m_Board.it_End(m_currCol); piter++ ) {
+	//Not king, can it block the check? 
+	if((*piter)->pieceType != PieceType::KING) {
+	//If we can step, it is not mate; checkLine.end()-1 => we are skipping the last element, because it is enemy
+	if (!m_isIntSectEmpty<Position>((*piter)->getMoveGrid(), checkLine.begin(), checkLine.end()-1)) {
+	return ;
+	}
 
-							if((*piter)->canMoveHit(*(checkLine.end()-1), MovType::HIT)){
-								return;
-							}
-						}
-						//Neither of the pieces could block the mate. The king can't avoid (we checked it earlier), so its mate (checkmate)
-						m_flags.isMate = true;
-				} 
-			}
-			else{//We can step away with the king only, but we checked it earlier
-				m_flags.isMate = true;
-				return; //Checkmate
-			}
-		}
-		else { //We were not in check-> can any piece move? Can the pieces which are blocking check move on the check line?
-			//Checking 8 directions, if one piece blocks the way, we are checking can it move on the line. The other pieces can move anywhere.
-			for (int i = 0; i < 8; i++) {//8 directions
-				int alliedPieces = 0;
-				const Piece* allyPiece;
-				checkLine.clear();//Delete
-				auto iter = lineITER(static_cast<lineITER::iterDIR>(i), *m_currKingPos);//We need the position dependent on the board
-				iter++;
-				for(; !iter.isFinished(); iter++) {
-					checkLine.push_back(*iter);//Adding the fields, on we are going
-					if(m_checkStraightDir((*iter), alliedPieces, *m_currKingPos) == true) {
-						break; //Found enemy piece
-					}
-					if(alliedPieces == 1) { //We found one allied piece, caching it
-						allyPiece = m_Board.getPieceAt(*iter);
-					}
-				}
-				if(m_activeCheck) { //We find the check line, if we didn't, the check comes from knight
-					break;
-				}
-			}
-		}
+	if((*piter)->canMoveHit(*(checkLine.end()-1), MovType::HIT)){
+	return;
+	}
+	}
+	//Neither of the pieces could block the mate. The king can't avoid (we checked it earlier), so its mate (checkmate)
+	m_flags.isMate = true;
+	} 
+	}
+	else{//We can step away with the king only, but we checked it earlier
+	m_flags.isMate = true;
+	return; //Checkmate
+	}
+	}
+	else { //We were not in check-> can any piece move? Can the pieces which are blocking check move on the check line?
+	//Checking 8 directions, if one piece blocks the way, we are checking can it move on the line. The other pieces can move anywhere.
+	for (int i = 0; i < 8; i++) {//8 directions
+	int alliedPieces = 0;
+	const Piece* allyPiece;
+	checkLine.clear();//Delete
+	auto iter = lineITER(static_cast<lineITER::iterDIR>(i), *m_currKingPos);//We need the position dependent on the board
+	iter++;
+	for(; !iter.isFinished(); iter++) {
+	checkLine.push_back(*iter);//Adding the fields, on we are going
+	if(m_checkStraightDir((*iter), alliedPieces, *m_currKingPos) == true) {
+	break; //Found enemy piece
+	}
+	if(alliedPieces == 1) { //We found one allied piece, caching it
+	allyPiece = m_Board.getPieceAt(*iter);
+	}
+	}
+	if(m_activeCheck) { //We find the check line, if we didn't, the check comes from knight
+	break;
+	}
+	}
+	}
 
 	}*/
 	//For mate check
@@ -485,7 +495,9 @@ namespace ch {
 		m_flags.isCheck = m_activeCheck;
 		m_checkForMate();
 	}
-
+	/** \brief Resets the engine's status.
+	* \details Resets the current color to white, flags to false, activeCheck flag to false, and saves the board.
+	*/
 	void ChessEngine::ResetEngine() {
 		m_currCol = Color::WHITE;
 		m_flags.isCheck = false;
@@ -497,7 +509,9 @@ namespace ch {
 	ChessEngine::~ChessEngine(void)
 	{
 	}
-
+	/** \brief Increment operator for the special iterator.
+	* \details Sets the next position in the iterator, as the corresponding direction mentions.
+	*/
 	void ChessEngine::lineITER::operator++(int) {
 		try {
 			switch (m_iterDirection)

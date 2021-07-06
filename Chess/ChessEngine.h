@@ -7,6 +7,11 @@
 
 namespace ch {
 
+	/**
+	* \file ChessEngine.h
+	* \brief Header of the ChessEngine
+	*/
+
 	/** \brief Manages the game-flow demanding the rules.
 	*/
 	class ChessEngine : public ISerializable {
@@ -96,6 +101,10 @@ namespace ch {
 		Pawn* m_delEnPassCache; /**< \brief An enPassant able pawn is stored here, should be deleted after a round. */
 		Board& m_Board;
 	public:
+		/** \brief Set the given function pointer as pawnSwap event function.
+		* \details In case of pawn swap, the engine calls this function, to get the piece that the user wants to replace the pawn.
+		*\param [in] A function pointer with PieceType return value, and void argument list.
+		*/
 		void setPawnSwapFunction(PieceType (*fnc)(void)){ m_pawnSwapEvent = fnc;}
 		const flags& gameFlags; /**< \brief  Reference to the game flags, to get them from the outside. */
 		ChessEngine(Board& chessBoard, const King* whiteKing = nullptr, const King* blackKing = nullptr);

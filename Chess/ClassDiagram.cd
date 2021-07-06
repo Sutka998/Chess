@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="ch::Board">
+    <Position X="7.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEADCAAAAAAAAAAAAAAChEAAGAIgICCCQgAAA=</HashCode>
+      <FileName>Board.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::ChessEngine">
+    <Position X="9.75" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="ch::ChessEngine::side_t" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ChessEngine.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Class Name="ch::ChessEngine::lineITER" Collapsed="true">
+        <NestedTypes>
+          <Enum Name="ch::ChessEngine::lineITER::iterDIR" Collapsed="true">
+            <TypeIdentifier>
+              <NewMemberFileName>ChessEngine.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Enum>
+        </NestedTypes>
+        <TypeIdentifier>
+          <NewMemberFileName>ChessEngine.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Struct Name="ch::ChessEngine::intPair" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ChessEngine.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="ch::ChessEngine::flags" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ChessEngine.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ASAAiAAEAEYQCoAABAAEABIQAmBAAACAAQQQEAEIgAI=</HashCode>
+      <FileName>ChessEngine.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Game">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="ch::Game::startPos" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Game.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="ch::Game::commands" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Game.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AQAAAAAQAAAQAAA4AAAAAChABAiIAAAABAQBAAIAAAA=</HashCode>
+      <FileName>Game.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Graphics">
+    <Position X="13.5" Y="7" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="ch::Graphics::graphicsMode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Graphics.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AACAAAlAAAAEAAAAAAAAAAAACAAAAAAgAAQAAAAAAAE=</HashCode>
+      <FileName>Graphics.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Piece">
+    <Position X="3.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAIIAAACAAACggQBoAAAAAICBABACCCACRoAhAAAA=</HashCode>
+      <FileName>Piece.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Column">
+    <Position X="11.75" Y="7" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="ch::Column::CL" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Position.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAQAAAAARAAQCAAAAAAEAAAAAgAAAAAAA=</HashCode>
+      <FileName>Position.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Position">
+    <Position X="15.25" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAEAkAEAAAgAAAAAQACAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Position.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Bishop">
+    <Position X="8.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAgAAAQAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Bishop.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::King">
+    <Position X="5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAgAABAAAgAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>King.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Knight">
+    <Position X="6.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAEAAAAAAAgAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Knight.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Pawn">
+    <Position X="5.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAEAAAhAgAAggAAEAAACBAAAAAAACQAAAAABA=</HashCode>
+      <FileName>Pawn.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Queen">
+    <Position X="3.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gEAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Queen.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ch::Rook">
+    <Position X="5.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAEgAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Rook.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ISerializable">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Iserializable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="ch::Color">
+    <Position X="14" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Piece.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ch::PieceType">
+    <Position X="14" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAgAAAABAAAAAAAAAAAAAAAAAAAAAAgBAAAg=</HashCode>
+      <FileName>Piece.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ch::MovType">
+    <Position X="14" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgIA=</HashCode>
+      <FileName>Piece.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
